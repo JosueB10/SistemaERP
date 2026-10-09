@@ -1,11 +1,32 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { FormEvent, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [enviando, setEnviando] = useState(false)
+
+  async function iniciarSesion(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    setEnviando(true)
+    setError(null)
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+    setEnviando(false)
+    if (authError) {
+      setError(authError.message === 'Invalid login credentials'
+        ? 'Correo o contraseña incorrectos.'
+        : `No se pudo iniciar sesión: ${authError.message}`)
+      return
+    }
+    router.replace('/dashboard')
+  }
 
   return (
     <main className="min-h-screen bg-stone-100 flex items-center justify-center px-4">
@@ -39,7 +60,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={iniciarSesion}>
             
             {/* Correo */}
             <div>
@@ -59,6 +80,10 @@ export default function LoginPage() {
                 <input
                   id="email"
                   type="email"
+                  required
+                  autoComplete="username"
+                  value={email}
+                  onChange={(evento) => setEmail(evento.target.value)}
                   placeholder="correo@ejemplo.com"
                   className="w-full h-11 pl-10 pr-4 rounded-lg border border-stone-300 outline-none focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700 text-sm"
                 />
@@ -83,6 +108,10 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(evento) => setPassword(evento.target.value)}
                   placeholder="••••••••"
                   className="w-full h-11 pl-10 pr-11 rounded-lg border border-stone-300 outline-none focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700 text-sm"
                 />
@@ -111,13 +140,15 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Botón */}
-            <Link
-              href="/dashboard"
-              className="flex items-center justify-center w-full h-11 rounded-lg bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition"
+            {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={enviando}
+              className="flex items-center justify-center w-full h-11 rounded-lg bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition disabled:opacity-60"
             >
-              Iniciar sesión
-            </Link>
+              {enviando ? 'Validando…' : 'Iniciar sesión'}
+            </button>
 
           </form>
         </div>

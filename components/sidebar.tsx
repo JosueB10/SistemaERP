@@ -60,6 +60,10 @@ const menuItems: MenuItem[] = [
     icon: Package,
     children: [
       {
+        label: 'Resumen',
+        href: '/inventario'
+      },
+      {
         label: 'Productos',
         href: '/inventario/productos'
       },
