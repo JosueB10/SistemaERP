@@ -2,7 +2,11 @@
 
 import { useState } from 'react'
 
-import { registrarMovimiento, useInventario } from '@/lib/inventario/store'
+import Link from 'next/link'
+
+import { registrarMovimiento, useInventario, venderProducto } from '@/lib/inventario/store'
+import { useProduccion } from '@/lib/produccion/store'
+import { recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
 import type {
   ClaseArticulo,
   SentidoAjuste,
@@ -15,6 +19,7 @@ import {
   fechaHoy,
   formatoCantidad,
   MOTIVOS_SUGERIDOS,
+  normalizarTexto,
   validarNumero,
   variacionMovimiento
 } from '@/lib/inventario/utilidades'
@@ -36,6 +41,7 @@ export default function MovimientoFormulario({
   onGuardado: (mensaje: string) => void
 }) {
   const datos = useInventario()
+  const { recetas } = useProduccion()
 
   const [valores, setValores] = useState({
     fecha: fechaHoy(),
@@ -73,6 +79,16 @@ export default function MovimientoFormulario({
         variacionMovimiento({ tipo: valores.tipo, sentido: valores.sentido, cantidad: cantidadNumerica })
       : null
 
+  // Venta de producto: lo que no haya en stock se fabrica al momento descontando su materia prima
+  const esVenta = esProducto && valores.tipo === 'salida' && normalizarTexto(valores.motivo) === 'venta'
+  const receta = esVenta && valores.articuloId ? recetaDeProducto(recetas, valores.articuloId) : undefined
+  const cantidadVenta = esVenta && articulo && Number.isInteger(cantidadNumerica) && cantidadNumerica > 0 ? cantidadNumerica : 0
+  const desdeStock = articulo ? Math.min(Math.max(articulo.existencias, 0), cantidadVenta) : 0
+  const fabricadas = cantidadVenta - desdeStock
+  const consumoVenta = fabricadas > 0 ? requerimientos(receta, fabricadas, datos.materiasPrimas) : []
+  const ventaSinReceta = fabricadas > 0 && !tieneMateriaDefinida(receta)
+  const ventaSinMateria = consumoVenta.some((linea) => linea.faltante > 0)
+
   const enviar = async (evento: React.FormEvent) => {
     evento.preventDefault()
     const nuevosErrores: Errores = {}
@@ -88,12 +104,32 @@ export default function MovimientoFormulario({
       entero: esProducto
     })
     if (cantidad.error) nuevosErrores.cantidad = cantidad.error
-    else if (vistaPrevia !== null && vistaPrevia < 0) {
+    else if (esVenta && ventaSinReceta) {
+      nuevosErrores.cantidad = `Solo hay ${formatoCantidad(articulo!.existencias)} und y el producto no tiene receta para fabricar el resto.`
+    } else if (esVenta && ventaSinMateria) {
+      nuevosErrores.cantidad = 'No hay materia prima suficiente para fabricar las unidades que faltan.'
+    } else if (!esVenta && vistaPrevia !== null && vistaPrevia < 0) {
       nuevosErrores.cantidad = `No hay existencias suficientes. Disponible: ${formatoCantidad(articulo!.existencias)} ${articulo!.unidad}.`
     }
 
     setErrores(nuevosErrores)
     if (Object.keys(nuevosErrores).length > 0) return
+
+    if (esVenta) {
+      const venta = await venderProducto({
+        productoId: valores.articuloId,
+        cantidad: cantidad.valor!,
+        fecha: valores.fecha,
+        motivo: valores.motivo,
+        observaciones: valores.observaciones
+      })
+      if (!venta.ok) {
+        setErrorGeneral(venta.error)
+        return
+      }
+      onGuardado(venta.fabricadas ? `Venta registrada: ${venta.fabricadas} und fabricadas con materia prima` : 'Venta registrada')
+      return
+    }
 
     const resultado = await registrarMovimiento({
       fecha: valores.fecha,
@@ -227,7 +263,13 @@ export default function MovimientoFormulario({
           />
         </Campo>
 
-        <Campo etiqueta="Motivo" htmlFor="mov-motivo" error={errores.motivo} requerido>
+        <Campo
+          etiqueta="Motivo"
+          htmlFor="mov-motivo"
+          error={errores.motivo}
+          ayuda={esProducto && valores.tipo === 'salida' ? 'Con "Venta", lo que falte en stock se fabrica y se descuenta su materia prima.' : undefined}
+          requerido
+        >
           <input
             id="mov-motivo"
             list="motivos-movimiento"
@@ -255,7 +297,30 @@ export default function MovimientoFormulario({
         </Campo>
       </div>
 
-      {articulo && vistaPrevia !== null && (
+      {esVenta && articulo && cantidadVenta > 0 && (
+        <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 space-y-2">
+          <p>
+            Del stock terminado: <strong>{formatoCantidad(desdeStock)} und</strong>
+            {fabricadas > 0 && <> · Se fabrican al vender: <strong>{formatoCantidad(fabricadas)} und</strong></>}
+          </p>
+          {fabricadas > 0 && (ventaSinReceta ? (
+            <p className="text-red-600">
+              El producto no tiene receta.{' '}
+              <Link href={`/produccion/recetas?producto=${encodeURIComponent(valores.articuloId)}`} className="font-medium underline">Definir receta</Link>
+            </p>
+          ) : (
+            <ul className="space-y-0.5 text-xs">
+              {consumoVenta.map((linea) => (
+                <li key={linea.materiaPrimaId} className={linea.faltante > 0 ? 'text-red-600' : 'text-stone-600'}>
+                  − {formatoCantidad(linea.requerido)} {linea.unidad} de {linea.nombre} (disponible {formatoCantidad(linea.disponible)})
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      )}
+
+      {!esVenta && articulo && vistaPrevia !== null && (
         <div
           className={`rounded-lg border px-4 py-3 text-sm ${
             vistaPrevia < 0

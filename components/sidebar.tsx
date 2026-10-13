@@ -141,8 +141,25 @@ const menuItems: MenuItem[] = [
 
   {
     label: 'Recursos Humanos',
-    href: '/recursos-humanos',
-    icon: Users
+    icon: Users,
+    children: [
+      {
+        label: 'Resumen',
+        href: '/recursos-humanos'
+      },
+      {
+        label: 'Empleados',
+        href: '/recursos-humanos/empleados'
+      },
+      {
+        label: 'Asistencia',
+        href: '/recursos-humanos/asistencia'
+      },
+      {
+        label: 'Nómina',
+        href: '/recursos-humanos/nomina'
+      }
+    ]
   },
 
   {

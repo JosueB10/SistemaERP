@@ -134,3 +134,15 @@ export async function registrarMovimiento(e: MovimientoEntrada): Promise<Resulta
   if (log.error) { await supabase.from(tabla).update({ stock_actual: anterior }).eq('id', e.articuloId); return resultado(log.error) }
   try { await cargarInventario(true); return { ok: true } } catch (err) { return { ok: false, error: (err as Error).message } }
 }
+
+// Venta de producto terminado: sale del stock y, si no alcanza, las unidades faltantes se fabrican
+// al momento descontando la materia prima de su receta (función vender_producto en la base).
+export async function venderProducto(e: { productoId: string; cantidad: number; fecha: string; motivo: string; observaciones?: string }): Promise<ResultadoAccion & { fabricadas?: number }> {
+  const sesion = await validarSesion()
+  if (!sesion.ok) return sesion
+  if (!Number.isInteger(e.cantidad) || e.cantidad <= 0) return { ok: false, error: 'La cantidad debe ser un número entero mayor que cero.' }
+  const venta = await supabase.rpc('vender_producto', { p_producto_id: Number(e.productoId), p_cantidad: e.cantidad, p_fecha: e.fecha, p_motivo: e.motivo.trim(), p_observaciones: e.observaciones?.trim() || null })
+  if (venta.error) return resultado(venta.error)
+  try { await cargarInventario(true) } catch (err) { return { ok: false, error: (err as Error).message } }
+  return { ok: true, fabricadas: Number((venta.data as { fabricadas?: number } | null)?.fabricadas ?? 0) }
+}

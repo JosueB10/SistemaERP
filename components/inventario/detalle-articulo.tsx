@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { ArrowRightLeft, Pencil } from 'lucide-react'
 
 import { useInventario } from '@/lib/inventario/store'
+import { useProduccion } from '@/lib/produccion/store'
+import { capacidadProduccion, costoReceta, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
 import type { ClaseArticulo } from '@/lib/inventario/tipos'
 import {
   buscarArticulo,
@@ -101,6 +103,8 @@ export default function DetalleArticulo({
         ))}
       </dl>
 
+      {producto && <MateriaPrimaProducto productoId={producto.id} />}
+
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-stone-900">Últimos movimientos</h3>
@@ -143,6 +147,43 @@ export default function DetalleArticulo({
           </ul>
         )}
       </div>
+    </div>
+  )
+}
+
+// Receta del producto: materia prima que se descuenta al producir o al vender sin stock
+function MateriaPrimaProducto({ productoId }: { productoId: string }) {
+  const { materiasPrimas } = useInventario()
+  const { recetas } = useProduccion()
+  const receta = recetaDeProducto(recetas, productoId)
+  const enlace = `/produccion/recetas?producto=${encodeURIComponent(productoId)}`
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-stone-900">Materia prima por unidad</h3>
+        <Link href={enlace} className="text-xs font-medium text-stone-600 hover:text-stone-900">
+          {tieneMateriaDefinida(receta) ? 'Editar receta' : 'Definir receta'}
+        </Link>
+      </div>
+      {tieneMateriaDefinida(receta) ? (
+        <>
+          <ul className="divide-y divide-stone-100 rounded-lg border border-stone-200">
+            {requerimientos(receta, 1, materiasPrimas).map((linea) => (
+              <li key={linea.materiaPrimaId} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                <span className="text-stone-700">{linea.nombre}</span>
+                <span className="font-medium text-stone-900 whitespace-nowrap">{formatoCantidad(linea.porUnidad)} {linea.unidad}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-stone-400 mt-2">
+            Costo de materia prima: {formatoCordobas(costoReceta(receta, materiasPrimas))} · Con el stock actual se pueden fabricar{' '}
+            {formatoCantidad(capacidadProduccion(receta, materiasPrimas) ?? 0)} und
+          </p>
+        </>
+      ) : (
+        <p className="text-sm text-amber-700">Aún no se ha indicado qué materia prima utiliza este producto.</p>
+      )}
     </div>
   )
 }

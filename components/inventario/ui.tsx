@@ -43,20 +43,22 @@ export function EncabezadoPagina({
   titulo,
   descripcion,
   acciones,
-  migas = true
+  migas = true,
+  seccion = { etiqueta: 'Inventario', href: '/inventario' }
 }: {
   titulo: string
   descripcion: string
   acciones?: React.ReactNode
   migas?: boolean
+  seccion?: { etiqueta: string; href: string }
 }) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         {migas && (
           <nav className="text-xs text-stone-400 mb-1">
-            <Link href="/inventario" className="hover:text-stone-700">
-              Inventario
+            <Link href={seccion.href} className="hover:text-stone-700">
+              {seccion.etiqueta}
             </Link>
             <span className="mx-1.5">/</span>
             <span className="text-stone-600">{titulo}</span>
@@ -289,18 +291,20 @@ export function ErrorFormulario({ mensaje }: { mensaje: string | null }) {
 
 export function PieFormulario({
   onCancelar,
-  textoGuardar
+  textoGuardar,
+  enviando = false
 }: {
   onCancelar: () => void
   textoGuardar: string
+  enviando?: boolean
 }) {
   return (
     <div className="flex flex-col-reverse gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:justify-end">
       <button type="button" onClick={onCancelar} className={claseBotonSecundario}>
         Cancelar
       </button>
-      <button type="submit" className={claseBotonPrimario}>
-        {textoGuardar}
+      <button type="submit" disabled={enviando} className={claseBotonPrimario}>
+        {enviando ? 'Guardando...' : textoGuardar}
       </button>
     </div>
   )
