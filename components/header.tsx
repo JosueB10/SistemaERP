@@ -7,7 +7,7 @@ import {
 
 export default function Header() {
   return (
-    <header className="h-20 bg-white border-b border-stone-200 flex items-center justify-between px-8">
+    <header className="h-20 bg-white border-b border-stone-200 flex items-center justify-between px-8 print:hidden">
 
       {/* SEARCH */}
 

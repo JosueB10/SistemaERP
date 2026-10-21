@@ -50,7 +50,7 @@ const menuItems: MenuItem[] = [
       },
       {
         label: 'Clientes',
-        href: '/clientes'
+        href: '/ventas/clientes'
       }
     ]
   },
@@ -115,7 +115,7 @@ const menuItems: MenuItem[] = [
       },
       {
         label: 'Proveedores',
-        href: '/proveedores'
+        href: '/compras/proveedores'
       }
     ]
   },
@@ -193,7 +193,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 min-h-screen bg-[#242424] text-white flex flex-col">
+    <aside className="w-64 min-h-screen bg-[#242424] text-white flex flex-col print:hidden">
 
       {/* LOGO */}
       <div className="h-20 flex items-center px-6 border-b border-white/10">
