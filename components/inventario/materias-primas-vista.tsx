@@ -104,7 +104,7 @@ export default function MateriasPrimasVista() {
       />
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 lg:flex-row lg:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 lg:flex-row lg:items-center">
           <Buscador
             valor={busqueda}
             onCambio={(valor) => {
@@ -142,7 +142,7 @@ export default function MateriasPrimasVista() {
             </select>
           </div>
           {hayFiltros && (
-            <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-stone-500 hover:text-stone-900 whitespace-nowrap">
+            <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap">
               Limpiar filtros
             </button>
           )}
@@ -157,7 +157,7 @@ export default function MateriasPrimasVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[920px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Código</th>
                   <th className={claseCabeceraTabla}>Material</th>
@@ -170,19 +170,19 @@ export default function MateriasPrimasVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map((materia) => (
-                  <tr key={materia.id} className="hover:bg-stone-50/60">
+                  <tr key={materia.id} className="hover:bg-zinc-50/60">
                     <td className={`${claseCeldaTabla} font-mono text-xs`}>{materia.codigo}</td>
-                    <td className={`${claseCeldaTabla} font-medium text-stone-900`}>{materia.nombre}</td>
+                    <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>{materia.nombre}</td>
                     <td className={claseCeldaTabla}>
                       <InsigniaNeutra>{materia.categoria}</InsigniaNeutra>
                     </td>
                     <td className={claseCeldaTabla} title={ETIQUETAS_UNIDAD[materia.unidad]}>
                       {ABREVIATURAS_UNIDAD[materia.unidad]}
                     </td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCantidad(materia.existencias)}</td>
-                    <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCantidad(materia.stockMinimo)}</td>
+                    <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCantidad(materia.existencias)}</td>
+                    <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCantidad(materia.stockMinimo)}</td>
                     <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(materia.costoUnitario)}</td>
                     <td className={claseCeldaTabla}>
                       <InsigniaEstado estado={estadoStock(materia.existencias, materia.stockMinimo)} />

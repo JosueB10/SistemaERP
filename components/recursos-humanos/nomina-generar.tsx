@@ -127,8 +127,8 @@ export default function NominaGenerar({
         </Campo>
       </div>
 
-      <div className="flex gap-2 rounded-lg bg-stone-50 border border-stone-200 px-3 py-2 text-xs text-stone-600">
-        <Info size={15} className="shrink-0 mt-0.5 text-stone-400" />
+      <div className="flex gap-2 rounded-lg bg-zinc-50 border border-zinc-200 px-3 py-2 text-xs text-zinc-600">
+        <Info size={15} className="shrink-0 mt-0.5 text-zinc-400" />
         <p>
           Ausencias y horas extra se toman de la asistencia del período y puede corregirlas aquí.
           INSS laboral {TASAS_NOMINA.inssLaboral * 100} %, IR según tabla progresiva anual,
@@ -138,11 +138,11 @@ export default function NominaGenerar({
       </div>
 
       {filas.length === 0 ? (
-        <p className="text-sm text-stone-500 text-center py-8">No hay empleados vigentes para este período.</p>
+        <p className="text-sm text-zinc-500 text-center py-8">No hay empleados vigentes para este período.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-stone-200">
+        <div className="overflow-x-auto rounded-lg border border-zinc-200">
           <table className="w-full min-w-[1100px]">
-            <thead className="bg-stone-50">
+            <thead className="bg-zinc-50/70">
               <tr>
                 <th className={claseCabeceraTabla}>Empleado</th>
                 <th className={`${claseCabeceraTabla} text-right`}>Salario</th>
@@ -156,14 +156,14 @@ export default function NominaGenerar({
                 <th className={`${claseCabeceraTabla} text-right`}>Neto</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-zinc-100">
               {filas.map(({ empleado, variables, linea }) => {
                 const nombre = nombreCompleto(empleado)
                 return (
                   <tr key={empleado.id}>
                     <td className={claseCeldaTabla}>
-                      <p className="font-medium text-stone-900">{nombre}</p>
-                      <p className="text-xs text-stone-400">{empleado.cargo}</p>
+                      <p className="font-medium text-zinc-900">{nombre}</p>
+                      <p className="text-xs text-zinc-400">{empleado.cargo}</p>
                     </td>
                     <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.salarioBase)}</td>
                     <td className="px-4 py-2 text-right">
@@ -176,20 +176,20 @@ export default function NominaGenerar({
                     </td>
                     <td className="px-4 py-2 text-right">{entrada(empleado.id, 'bonificaciones', variables.bonificaciones, `Bonificaciones de ${nombre}`)}</td>
                     <td className={`${claseCeldaTabla} text-right font-medium`}>{formatoCordobas(linea.totalDevengado)}</td>
-                    <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(linea.inssLaboral)}</td>
-                    <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(linea.ir)}</td>
+                    <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(linea.inssLaboral)}</td>
+                    <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(linea.ir)}</td>
                     <td className="px-4 py-2 text-right">{entrada(empleado.id, 'otrasDeducciones', variables.otrasDeducciones, `Otras deducciones de ${nombre}`)}</td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCordobas(linea.netoPagar)}</td>
+                    <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(linea.netoPagar)}</td>
                   </tr>
                 )
               })}
             </tbody>
-            <tfoot className="bg-stone-50 border-t border-stone-200">
+            <tfoot className="bg-zinc-50 border-t border-zinc-100">
               <tr>
                 <td className={`${claseCeldaTabla} font-semibold`} colSpan={5}>Totales ({filas.length} empleados)</td>
                 <td className={`${claseCeldaTabla} text-right font-semibold`}>{formatoCordobas(totales.devengado)}</td>
                 <td className={`${claseCeldaTabla} text-right font-semibold`} colSpan={3}>Deducciones {formatoCordobas(totales.deducciones)}</td>
-                <td className={`${claseCeldaTabla} text-right font-bold text-stone-900`}>{formatoCordobas(totales.neto)}</td>
+                <td className={`${claseCeldaTabla} text-right font-bold text-zinc-900`}>{formatoCordobas(totales.neto)}</td>
               </tr>
             </tfoot>
           </table>
@@ -200,9 +200,9 @@ export default function NominaGenerar({
         <Campo etiqueta="Observaciones" htmlFor="nomina-observaciones" className="sm:col-span-2">
           <input id="nomina-observaciones" value={observaciones} maxLength={250} onChange={(e) => setObservaciones(e.target.value)} className={claseInput} placeholder="Opcional" />
         </Campo>
-        <div className="rounded-lg bg-stone-50 border border-stone-200 px-3 py-2 text-xs text-stone-600">
+        <div className="rounded-lg bg-zinc-50 border border-zinc-200 px-3 py-2 text-xs text-zinc-600">
           Aportes patronales (INSS + INATEC)
-          <p className="text-sm font-semibold text-stone-900">{formatoCordobas(totales.aportesPatronales)}</p>
+          <p className="text-sm font-semibold text-zinc-900">{formatoCordobas(totales.aportesPatronales)}</p>
         </div>
       </div>
 

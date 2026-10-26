@@ -135,7 +135,7 @@ export default function OrdenFormulario({
       {valores.productoId && (
         tieneMateriaDefinida(receta) ? (
           <div>
-            <p className="text-xs font-medium text-stone-700 mb-2">Materia prima requerida</p>
+            <p className="text-xs font-medium text-zinc-700 mb-2">Materia prima requerida</p>
             <TablaRequerimientos lineas={lineas} cantidad={cantidadValida ? cantidad : 1} />
           </div>
         ) : (

@@ -48,10 +48,10 @@ export default function ReporteResultados({ periodo, archivo }: { periodo: Perio
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <section className={`${claseTarjeta} xl:col-span-2 break-inside-avoid`}>
-          <div className="flex items-start justify-between gap-3 border-b border-stone-200 px-5 py-4">
+          <div className="flex items-start justify-between gap-3 border-b border-zinc-100 px-5 py-4">
             <div>
-              <h2 className="font-semibold text-stone-900">Estado de resultados</h2>
-              <p className="text-xs text-stone-500 mt-0.5">Cifras sin IVA, en córdobas.</p>
+              <h2 className="font-semibold text-zinc-900">Estado de resultados</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">Cifras sin IVA, en córdobas.</p>
             </div>
             <button type="button" onClick={exportar} className={`${claseBotonTabla} print:hidden`}>
               <Download size={14} />
@@ -76,9 +76,9 @@ export default function ReporteResultados({ periodo, archivo }: { periodo: Perio
 
         <div className="space-y-6 self-start">
           <section className={`${claseTarjeta} break-inside-avoid`}>
-            <div className="border-b border-stone-200 px-5 py-4">
-              <h2 className="font-semibold text-stone-900">IVA del período</h2>
-              <p className="text-xs text-stone-500 mt-0.5">Tasa {TASA_IVA * 100} %. Referencia para la declaración.</p>
+            <div className="border-b border-zinc-100 px-5 py-4">
+              <h2 className="font-semibold text-zinc-900">IVA del período</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">Tasa {TASA_IVA * 100} %. Referencia para la declaración.</p>
             </div>
             <table className="w-full">
               <tbody>
@@ -89,8 +89,8 @@ export default function ReporteResultados({ periodo, archivo }: { periodo: Perio
             </table>
           </section>
 
-          <section className="rounded-xl border border-stone-200 bg-stone-50 px-5 py-4 text-xs text-stone-600 space-y-2 break-inside-avoid">
-            <p className="font-medium text-stone-800">Cómo se calcula</p>
+          <section className="rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-4 text-xs text-zinc-600 space-y-2 break-inside-avoid">
+            <p className="font-medium text-zinc-800">Cómo se calcula</p>
             <p>Las ventas se reconocen en su fecha, sin IVA, y su costo es el costo de producción del producto al momento de vender.</p>
             <p>Las compras de materia prima no se restan como gasto: se reflejan en el costo de ventas cuando el producto se vende. Para ver el dinero que salió por compras, use el reporte Flujo de caja.</p>
             <p>Gastos operativos incluye la nómina pagada (salarios y aportes patronales) y los gastos registrados en Finanzas. No incluye el IR anual.</p>

@@ -19,7 +19,7 @@ export function AvisoConexionVentas() {
 // Insignia para documentos completados/anulados (ventas y compras) y ventas pendientes de producción
 export function InsigniaDocumento({ anulado, texto, pendiente = false }: { anulado: boolean; texto: string; pendiente?: boolean }) {
   const estilo = anulado
-    ? 'bg-stone-100 text-stone-500 ring-stone-500/20'
+    ? 'bg-zinc-100 text-zinc-500 ring-zinc-500/20'
     : pendiente
       ? 'bg-amber-50 text-amber-700 ring-amber-600/20'
       : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
@@ -47,22 +47,22 @@ export function ResumenTotales({
   return (
     <dl className="space-y-2 text-sm">
       <div className="flex justify-between gap-3">
-        <dt className="text-stone-500">Subtotal</dt>
-        <dd className="text-stone-900">{formatoCordobas(subtotal)}</dd>
+        <dt className="text-zinc-500">Subtotal</dt>
+        <dd className="text-zinc-900">{formatoCordobas(subtotal)}</dd>
       </div>
       {descuento > 0 && (
         <div className="flex justify-between gap-3">
-          <dt className="text-stone-500">Descuento</dt>
-          <dd className="text-stone-900">-{formatoCordobas(descuento)}</dd>
+          <dt className="text-zinc-500">Descuento</dt>
+          <dd className="text-zinc-900">-{formatoCordobas(descuento)}</dd>
         </div>
       )}
       <div className="flex justify-between gap-3">
-        <dt className="text-stone-500">IVA ({TASA_IVA * 100} %)</dt>
-        <dd className="text-stone-900">{formatoCordobas(impuesto)}</dd>
+        <dt className="text-zinc-500">IVA ({TASA_IVA * 100} %)</dt>
+        <dd className="text-zinc-900">{formatoCordobas(impuesto)}</dd>
       </div>
-      <div className="flex justify-between gap-3 border-t border-stone-200 pt-2">
-        <dt className="font-semibold text-stone-900">Total</dt>
-        <dd className="text-lg font-bold text-stone-900">{formatoCordobas(total)}</dd>
+      <div className="flex justify-between gap-3 border-t border-zinc-100 pt-2">
+        <dt className="font-semibold text-zinc-900">Total</dt>
+        <dd className="text-lg font-bold text-zinc-900">{formatoCordobas(total)}</dd>
       </div>
       {extra}
     </dl>

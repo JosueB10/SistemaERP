@@ -65,7 +65,7 @@ export default function StockBajoVista() {
       </div>
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-center">
           <Buscador valor={busqueda} onCambio={setBusqueda} placeholder="Buscar por código o nombre" />
           <select
             value={filtroClase}
@@ -95,7 +95,7 @@ export default function StockBajoVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Código</th>
                   <th className={claseCabeceraTabla}>Nombre</th>
@@ -107,18 +107,18 @@ export default function StockBajoVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {filtradas.map((item) => {
                   const diferencia = Math.round((item.existencias - item.stockMinimo) * 100) / 100
                   return (
-                    <tr key={`${item.clase}-${item.id}`} className="hover:bg-stone-50/60">
+                    <tr key={`${item.clase}-${item.id}`} className="hover:bg-zinc-50/60">
                       <td className={`${claseCeldaTabla} font-mono text-xs`}>{item.codigo}</td>
-                      <td className={`${claseCeldaTabla} font-medium text-stone-900`}>{item.nombre}</td>
+                      <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>{item.nombre}</td>
                       <td className={claseCeldaTabla}>{ETIQUETAS_CLASE[item.clase]}</td>
-                      <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>
+                      <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>
                         {formatoCantidad(item.existencias)} {item.unidad}
                       </td>
-                      <td className={`${claseCeldaTabla} text-right text-stone-500`}>
+                      <td className={`${claseCeldaTabla} text-right text-zinc-500`}>
                         {formatoCantidad(item.stockMinimo)} {item.unidad}
                       </td>
                       <td className={`${claseCeldaTabla} text-right font-semibold ${diferencia < 0 ? 'text-red-600' : 'text-amber-600'}`}>

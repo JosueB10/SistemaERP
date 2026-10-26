@@ -106,7 +106,7 @@ export default function ProductosVista() {
       />
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 lg:flex-row lg:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 lg:flex-row lg:items-center">
           <Buscador
             valor={busqueda}
             onCambio={(valor) => {
@@ -157,7 +157,7 @@ export default function ProductosVista() {
             </select>
           </div>
           {hayFiltros && (
-            <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-stone-500 hover:text-stone-900 whitespace-nowrap">
+            <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap">
               Limpiar filtros
             </button>
           )}
@@ -172,7 +172,7 @@ export default function ProductosVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>SKU</th>
                   <th className={claseCabeceraTabla}>Nombre</th>
@@ -186,19 +186,19 @@ export default function ProductosVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map((producto) => (
-                  <tr key={producto.id} className="hover:bg-stone-50/60">
+                  <tr key={producto.id} className="hover:bg-zinc-50/60">
                     <td className={`${claseCeldaTabla} font-mono text-xs`}>{producto.sku}</td>
-                    <td className={`${claseCeldaTabla} font-medium text-stone-900`}>{producto.nombre}</td>
+                    <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>{producto.nombre}</td>
                     <td className={claseCeldaTabla}>
                       <InsigniaNeutra>{ETIQUETAS_TIPO_PRODUCTO[producto.tipo]}</InsigniaNeutra>
                     </td>
                     <td className={claseCeldaTabla}>{producto.categoria}</td>
                     <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(producto.precioVenta)}</td>
-                    <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(producto.costoProduccion)}</td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCantidad(producto.existencias)}</td>
-                    <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCantidad(producto.stockMinimo)}</td>
+                    <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(producto.costoProduccion)}</td>
+                    <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCantidad(producto.existencias)}</td>
+                    <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCantidad(producto.stockMinimo)}</td>
                     <td className={claseCeldaTabla}>
                       <InsigniaEstado estado={estadoStock(producto.existencias, producto.stockMinimo)} />
                     </td>

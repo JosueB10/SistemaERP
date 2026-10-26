@@ -64,7 +64,7 @@ export default function NominaVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Período</th>
                   <th className={claseCabeceraTabla}>Tipo</th>
@@ -76,17 +76,17 @@ export default function NominaVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map((nomina) => (
-                  <tr key={nomina.id} className="hover:bg-stone-50/60">
-                    <td className={`${claseCeldaTabla} font-medium text-stone-900`}>
+                  <tr key={nomina.id} className="hover:bg-zinc-50/60">
+                    <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>
                       {formatoFecha(nomina.periodoInicio)} – {formatoFecha(nomina.periodoFin)}
                     </td>
                     <td className={claseCeldaTabla}><InsigniaNeutra>{ETIQUETAS_PERIODICIDAD[nomina.periodicidad]}</InsigniaNeutra></td>
                     <td className={`${claseCeldaTabla} text-right`}>{nomina.lineas.length}</td>
                     <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(nomina.totalDevengado)}</td>
-                    <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(nomina.totalDeducciones)}</td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCordobas(nomina.totalNeto)}</td>
+                    <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(nomina.totalDeducciones)}</td>
+                    <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(nomina.totalNeto)}</td>
                     <td className={claseCeldaTabla}><InsigniaNomina estado={nomina.estado} /></td>
                     <td className={`${claseCeldaTabla} text-right`}>
                       <button type="button" onClick={() => setModal({ tipo: 'detalle', nominaId: nomina.id })} className={claseBotonTabla}>
@@ -167,11 +167,11 @@ function DetalleNomina({ nomina, onAccion }: { nomina: Nomina; onAccion: (mensaj
         <DatoDetalle etiqueta="Neto a pagar" valor={<span className="font-semibold">{formatoCordobas(nomina.totalNeto)}</span>} />
         <DatoDetalle etiqueta="Aportes patronales" valor={formatoCordobas(nomina.totalAportesPatronales)} />
       </dl>
-      {nomina.observaciones && <p className="text-sm text-stone-500">{nomina.observaciones}</p>}
+      {nomina.observaciones && <p className="text-sm text-zinc-500">{nomina.observaciones}</p>}
 
-      <div className="overflow-x-auto rounded-lg border border-stone-200">
+      <div className="overflow-x-auto rounded-lg border border-zinc-200">
         <table className="w-full min-w-[1100px]">
-          <thead className="bg-stone-50">
+          <thead className="bg-zinc-50/70">
             <tr>
               <th className={claseCabeceraTabla}>Empleado</th>
               <th className={`${claseCabeceraTabla} text-right`}>Salario</th>
@@ -185,14 +185,14 @@ function DetalleNomina({ nomina, onAccion }: { nomina: Nomina; onAccion: (mensaj
               <th className={`${claseCabeceraTabla} text-right`}>Neto</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-zinc-100">
             {lineas.map((linea) => {
               const empleado = porId.get(linea.empleadoId)
               return (
                 <tr key={linea.empleadoId}>
                   <td className={claseCeldaTabla}>
-                    <p className="font-medium text-stone-900">{empleado ? nombreCompleto(empleado) : 'Empleado eliminado'}</p>
-                    {empleado && <p className="text-xs text-stone-400">{empleado.codigo} · {empleado.numeroInss || 'Sin N.º INSS'}</p>}
+                    <p className="font-medium text-zinc-900">{empleado ? nombreCompleto(empleado) : 'Empleado eliminado'}</p>
+                    {empleado && <p className="text-xs text-zinc-400">{empleado.codigo} · {empleado.numeroInss || 'Sin N.º INSS'}</p>}
                   </td>
                   <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.salarioBase)}</td>
                   <td className={`${claseCeldaTabla} text-right`}>
@@ -203,33 +203,33 @@ function DetalleNomina({ nomina, onAccion }: { nomina: Nomina; onAccion: (mensaj
                   </td>
                   <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.bonificaciones)}</td>
                   <td className={`${claseCeldaTabla} text-right font-medium`}>{formatoCordobas(linea.totalDevengado)}</td>
-                  <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(linea.inssLaboral)}</td>
-                  <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(linea.ir)}</td>
-                  <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(linea.otrasDeducciones)}</td>
-                  <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCordobas(linea.netoPagar)}</td>
+                  <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(linea.inssLaboral)}</td>
+                  <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(linea.ir)}</td>
+                  <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(linea.otrasDeducciones)}</td>
+                  <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(linea.netoPagar)}</td>
                 </tr>
               )
             })}
           </tbody>
-          <tfoot className="bg-stone-50 border-t border-stone-200">
+          <tfoot className="bg-zinc-50 border-t border-zinc-100">
             <tr>
               <td className={`${claseCeldaTabla} font-semibold`} colSpan={5}>Totales</td>
               <td className={`${claseCeldaTabla} text-right font-semibold`}>{formatoCordobas(nomina.totalDevengado)}</td>
               <td className={`${claseCeldaTabla} text-right font-semibold`} colSpan={3}>Deducciones {formatoCordobas(nomina.totalDeducciones)}</td>
-              <td className={`${claseCeldaTabla} text-right font-bold text-stone-900`}>{formatoCordobas(nomina.totalNeto)}</td>
+              <td className={`${claseCeldaTabla} text-right font-bold text-zinc-900`}>{formatoCordobas(nomina.totalNeto)}</td>
             </tr>
           </tfoot>
         </table>
       </div>
 
       {nomina.estado === 'borrador' && (
-        <div className="flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:items-end sm:justify-end">
+        <div className="flex flex-col gap-2 border-t border-zinc-100 pt-4 sm:flex-row sm:items-end sm:justify-end">
           <button type="button" onClick={eliminar} disabled={procesando} className={claseBotonSecundario}>
             <Trash2 size={16} />
             Eliminar borrador
           </button>
           <div className="sm:w-44">
-            <label htmlFor="nomina-fecha-pago" className="block text-xs font-medium text-stone-700 mb-1.5">Fecha de pago</label>
+            <label htmlFor="nomina-fecha-pago" className="block text-xs font-medium text-zinc-700 mb-1.5">Fecha de pago</label>
             <input id="nomina-fecha-pago" type="date" value={fechaPago} onChange={(e) => setFechaPago(e.target.value)} className={claseInput} />
           </div>
           <button type="button" onClick={pagar} disabled={procesando} className={claseBotonPrimario}>

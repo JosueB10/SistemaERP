@@ -18,8 +18,8 @@ export default function GuardiaSesion({ children }: { children: React.ReactNode 
 
   if (!verificada || !usuario) {
     return (
-      <div className="min-h-screen bg-[#f5f3f0] flex items-center justify-center">
-        <p className="text-sm text-stone-500">Verificando sesión…</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-sm text-zinc-500">Verificando sesión…</p>
       </div>
     )
   }

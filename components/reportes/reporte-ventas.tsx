@@ -50,8 +50,8 @@ export default function ReporteVentas({ periodo, archivo }: { periodo: Periodo; 
 
       {mesesGrafico.length > 1 && (
         <section className={`${claseTarjeta} p-5 break-inside-avoid`}>
-          <h2 className="font-semibold text-stone-900">Ventas netas por mes</h2>
-          <p className="text-xs text-stone-500 mb-5">Sin IVA{porMes.length > mesesGrafico.length ? ' · últimos 24 meses del período' : ''}</p>
+          <h2 className="font-semibold text-zinc-900">Ventas netas por mes</h2>
+          <p className="text-xs text-zinc-500 mb-5">Sin IVA{porMes.length > mesesGrafico.length ? ' · últimos 24 meses del período' : ''}</p>
           <GraficoColumnas
             descripcion="Ventas netas por mes"
             categorias={mesesGrafico.map((m) => etiquetaMesCorta(m.mes))}

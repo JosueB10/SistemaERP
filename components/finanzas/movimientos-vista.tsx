@@ -179,10 +179,10 @@ export default function MovimientosVista({ tipo }: { tipo: TipoFinanciero }) {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <section className={`${claseTarjeta} xl:col-span-2`}>
-          <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-center">
             <Buscador valor={busqueda} onCambio={(v) => { setBusqueda(v); setPagina(1) }} placeholder="Buscar por concepto o categoría" />
             {hayFiltros && (
-              <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-stone-500 hover:text-stone-900 whitespace-nowrap sm:ml-auto">
+              <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap sm:ml-auto">
                 Ver todo el historial
               </button>
             )}
@@ -197,7 +197,7 @@ export default function MovimientosVista({ tipo }: { tipo: TipoFinanciero }) {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px]">
-                <thead className="bg-stone-50">
+                <thead className="bg-zinc-50/70">
                   <tr>
                     <th className={claseCabeceraTabla}>Fecha</th>
                     <th className={claseCabeceraTabla}>Concepto</th>
@@ -207,24 +207,24 @@ export default function MovimientosVista({ tipo }: { tipo: TipoFinanciero }) {
                     <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="divide-y divide-zinc-100">
                   {visibles.map((m) => (
-                    <tr key={m.id} className="hover:bg-stone-50/60">
+                    <tr key={m.id} className="hover:bg-zinc-50/60">
                       <td className={claseCeldaTabla}>{formatoFecha(m.fecha)}</td>
                       <td className={`${claseCeldaTabla} whitespace-normal`}>
-                        <p className="font-medium text-stone-900">{m.concepto}</p>
+                        <p className="font-medium text-zinc-900">{m.concepto}</p>
                         {(m.metodoPago || m.observaciones) && (
-                          <p className="text-xs text-stone-400">
+                          <p className="text-xs text-zinc-400">
                             {[m.metodoPago && ETIQUETAS_METODO_PAGO[m.metodoPago], m.observaciones].filter(Boolean).join(' · ')}
                           </p>
                         )}
                       </td>
                       <td className={claseCeldaTabla}>{m.categoria}</td>
                       <td className={claseCeldaTabla}><OrigenMovimiento movimiento={m} /></td>
-                      <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCordobas(m.monto)}</td>
+                      <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(m.monto)}</td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         {esAutomatico(m) ? (
-                          <span className="text-xs text-stone-400">Automático</span>
+                          <span className="text-xs text-zinc-400">Automático</span>
                         ) : (
                           <div className="inline-flex gap-1">
                             <button type="button" onClick={() => setModal({ tipo: 'formulario', movimiento: m })} className={claseBotonTabla}>
@@ -248,9 +248,9 @@ export default function MovimientosVista({ tipo }: { tipo: TipoFinanciero }) {
         </section>
 
         <section className={`${claseTarjeta} self-start`}>
-          <div className="border-b border-stone-200 px-5 py-4">
-            <h2 className="font-semibold text-stone-900">Por categoría</h2>
-            <p className="text-xs text-stone-500">{hayFiltros ? 'Según los filtros' : 'Desde el inicio'}</p>
+          <div className="border-b border-zinc-100 px-5 py-4">
+            <h2 className="font-semibold text-zinc-900">Por categoría</h2>
+            <p className="text-xs text-zinc-500">{hayFiltros ? 'Según los filtros' : 'Desde el inicio'}</p>
           </div>
           <BarrasCategoria filas={porCategoria} color={tipo === 'ingreso' ? '#2a78d6' : '#eb6834'} vacio={`Sin ${textos.plural} en el período.`} />
         </section>

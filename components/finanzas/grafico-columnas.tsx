@@ -50,7 +50,7 @@ export default function GraficoColumnas({
   return (
     <figure className="w-full" aria-label={descripcion}>
       {series.length > 1 && (
-        <figcaption className="mb-3 flex flex-wrap gap-4 text-xs text-stone-600">
+        <figcaption className="mb-3 flex flex-wrap gap-4 text-xs text-zinc-600">
           {series.map((s) => (
             <span key={s.nombre} className="inline-flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: s.color }} />
@@ -62,7 +62,7 @@ export default function GraficoColumnas({
 
       <div className="flex gap-2">
         {/* Eje Y */}
-        <div className="relative w-12 shrink-0 text-right text-[11px] text-stone-400" style={{ height: alto }}>
+        <div className="relative w-12 shrink-0 text-right text-[11px] text-zinc-400" style={{ height: alto }}>
           {marcas.map((marca) => (
             <span key={marca} className="absolute right-0 -translate-y-1/2" style={{ top: `${(1 - marca / tope) * 100}%` }}>
               {formatoCompacto(marca)}
@@ -73,7 +73,7 @@ export default function GraficoColumnas({
         <div className="min-w-0 flex-1">
           <div className="relative" style={{ height: alto }}>
             {marcas.map((marca) => (
-              <div key={marca} className="absolute inset-x-0 border-t border-stone-200" style={{ top: `${(1 - marca / tope) * 100}%` }} />
+              <div key={marca} className="absolute inset-x-0 border-t border-zinc-100" style={{ top: `${(1 - marca / tope) * 100}%` }} />
             ))}
 
             <div className="absolute inset-0 flex">
@@ -87,7 +87,7 @@ export default function GraficoColumnas({
                   onMouseLeave={() => setActivo(null)}
                   onFocus={() => setActivo(i)}
                   onBlur={() => setActivo(null)}
-                  className={`relative flex flex-1 items-end justify-center gap-[2px] px-1 outline-none focus-visible:ring-2 focus-visible:ring-stone-300 transition-colors ${activo === i ? 'bg-stone-100/70' : ''}`}
+                  className={`relative flex flex-1 items-end justify-center gap-[2px] px-1 outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 transition-colors ${activo === i ? 'bg-zinc-100/70' : ''}`}
                 >
                   {series.map((s) => {
                     const valor = Math.max(0, s.valores[i] ?? 0)
@@ -103,18 +103,18 @@ export default function GraficoColumnas({
                   {activo === i && (
                     <div
                       role="tooltip"
-                      className={`pointer-events-none absolute bottom-full z-10 mb-2 w-max min-w-40 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs shadow-lg ${
+                      className={`pointer-events-none absolute bottom-full z-10 mb-2 w-max min-w-40 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs shadow-lg ${
                         i < categorias.length / 2 ? 'left-0' : 'right-0'
                       }`}
                     >
-                      <p className="mb-1 font-semibold text-stone-900">{categoria}</p>
+                      <p className="mb-1 font-semibold text-zinc-900">{categoria}</p>
                       {series.map((s) => (
-                        <p key={s.nombre} className="flex items-center justify-between gap-4 text-stone-600">
+                        <p key={s.nombre} className="flex items-center justify-between gap-4 text-zinc-600">
                           <span className="inline-flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: s.color }} />
                             {s.nombre}
                           </span>
-                          <span className="font-medium text-stone-900">{formato(s.valores[i] ?? 0)}</span>
+                          <span className="font-medium text-zinc-900">{formato(s.valores[i] ?? 0)}</span>
                         </p>
                       ))}
                     </div>
@@ -127,7 +127,7 @@ export default function GraficoColumnas({
           {/* Eje X */}
           <div className="mt-2 flex">
             {categorias.map((categoria) => (
-              <span key={categoria} className="flex-1 truncate text-center text-[11px] text-stone-500">{categoria}</span>
+              <span key={categoria} className="flex-1 truncate text-center text-[11px] text-zinc-500">{categoria}</span>
             ))}
           </div>
         </div>

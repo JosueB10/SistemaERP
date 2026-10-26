@@ -40,7 +40,7 @@ export default function DetalleArticulo({
   const articulo = buscarArticulo(datos, clase, id)
 
   if (!articulo) {
-    return <p className="text-sm text-stone-500">El artículo solicitado no existe.</p>
+    return <p className="text-sm text-zinc-500">El artículo solicitado no existe.</p>
   }
 
   const producto = clase === 'producto' ? datos.productos.find((item) => item.id === id) : undefined
@@ -77,7 +77,7 @@ export default function DetalleArticulo({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-lg font-semibold text-stone-900">{articulo.nombre}</p>
+          <p className="text-lg font-semibold text-zinc-900">{articulo.nombre}</p>
           <div className="mt-1">
             <InsigniaEstado estado={articulo.estado} />
           </div>
@@ -96,9 +96,9 @@ export default function DetalleArticulo({
 
       <dl className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
         {filas.map(([etiqueta, valor]) => (
-          <div key={etiqueta} className="flex justify-between gap-3 border-b border-stone-100 pb-2 text-sm">
-            <dt className="text-stone-500">{etiqueta}</dt>
-            <dd className="font-medium text-stone-800 text-right">{valor}</dd>
+          <div key={etiqueta} className="flex justify-between gap-3 border-b border-zinc-100 pb-2 text-sm">
+            <dt className="text-zinc-500">{etiqueta}</dt>
+            <dd className="font-medium text-zinc-800 text-right">{valor}</dd>
           </div>
         ))}
       </dl>
@@ -107,11 +107,11 @@ export default function DetalleArticulo({
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-stone-900">Últimos movimientos</h3>
+          <h3 className="text-sm font-semibold text-zinc-900">Últimos movimientos</h3>
           {movimientos.length > 0 && (
             <Link
               href={`/inventario/movimientos?articulo=${clase}:${encodeURIComponent(id)}`}
-              className="text-xs font-medium text-stone-600 hover:text-stone-900"
+              className="text-xs font-medium text-zinc-600 hover:text-zinc-900"
             >
               Ver historial completo
             </Link>
@@ -119,9 +119,9 @@ export default function DetalleArticulo({
         </div>
 
         {movimientos.length === 0 ? (
-          <p className="text-sm text-stone-400">Sin movimientos registrados.</p>
+          <p className="text-sm text-zinc-400">Sin movimientos registrados.</p>
         ) : (
-          <ul className="divide-y divide-stone-100 rounded-lg border border-stone-200">
+          <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
             {movimientos.slice(0, 5).map((mov) => {
               const variacion = variacionMovimiento(mov)
               return (
@@ -129,8 +129,8 @@ export default function DetalleArticulo({
                   <div className="flex items-center gap-3 min-w-0">
                     <InsigniaMovimiento tipo={mov.tipo} />
                     <div className="min-w-0">
-                      <p className="truncate text-stone-700">{mov.motivo}</p>
-                      <p className="text-xs text-stone-400">{formatoFecha(mov.fecha)}</p>
+                      <p className="truncate text-zinc-700">{mov.motivo}</p>
+                      <p className="text-xs text-zinc-400">{formatoFecha(mov.fecha)}</p>
                     </div>
                   </div>
                   <span
@@ -161,22 +161,22 @@ function MateriaPrimaProducto({ productoId }: { productoId: string }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-stone-900">Materia prima por unidad</h3>
-        <Link href={enlace} className="text-xs font-medium text-stone-600 hover:text-stone-900">
+        <h3 className="text-sm font-semibold text-zinc-900">Materia prima por unidad</h3>
+        <Link href={enlace} className="text-xs font-medium text-zinc-600 hover:text-zinc-900">
           {tieneMateriaDefinida(receta) ? 'Editar receta' : 'Definir receta'}
         </Link>
       </div>
       {tieneMateriaDefinida(receta) ? (
         <>
-          <ul className="divide-y divide-stone-100 rounded-lg border border-stone-200">
+          <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200">
             {requerimientos(receta, 1, materiasPrimas).map((linea) => (
               <li key={linea.materiaPrimaId} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
-                <span className="text-stone-700">{linea.nombre}</span>
-                <span className="font-medium text-stone-900 whitespace-nowrap">{formatoCantidad(linea.porUnidad)} {linea.unidad}</span>
+                <span className="text-zinc-700">{linea.nombre}</span>
+                <span className="font-medium text-zinc-900 whitespace-nowrap">{formatoCantidad(linea.porUnidad)} {linea.unidad}</span>
               </li>
             ))}
           </ul>
-          <p className="text-xs text-stone-400 mt-2">
+          <p className="text-xs text-zinc-400 mt-2">
             Costo de materia prima: {formatoCordobas(costoReceta(receta, materiasPrimas))} · Con el stock actual se pueden fabricar{' '}
             {formatoCantidad(capacidadProduccion(receta, materiasPrimas) ?? 0)} und
           </p>

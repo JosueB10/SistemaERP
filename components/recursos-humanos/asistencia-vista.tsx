@@ -53,15 +53,15 @@ export default function AsistenciaVista() {
       />
 
       <div className={`${claseTarjeta} mb-6`}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-semibold text-stone-900">Registro del día</h2>
-            <p className="text-xs text-stone-500 mt-0.5">
+            <h2 className="font-semibold text-zinc-900">Registro del día</h2>
+            <p className="text-xs text-zinc-500 mt-0.5">
               {delDia.length > 0 ? `Ya hay ${delDia.length} registros guardados para esta fecha; puede corregirlos.` : 'Aún no se ha registrado asistencia para esta fecha.'}
             </p>
           </div>
           <div className="sm:w-48">
-            <label htmlFor="asistencia-fecha" className="block text-xs font-medium text-stone-700 mb-1.5">Fecha</label>
+            <label htmlFor="asistencia-fecha" className="block text-xs font-medium text-zinc-700 mb-1.5">Fecha</label>
             <input
               id="asistencia-fecha"
               type="date"
@@ -154,7 +154,7 @@ function HojaAsistencia({
       {error && <div className="px-4 pt-4"><ErrorFormulario mensaje={error} /></div>}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[820px]">
-          <thead className="bg-stone-50">
+          <thead className="bg-zinc-50/70">
             <tr>
               <th className={claseCabeceraTabla}>Empleado</th>
               <th className={claseCabeceraTabla}>Estado</th>
@@ -162,14 +162,14 @@ function HojaAsistencia({
               <th className={claseCabeceraTabla}>Observaciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-zinc-100">
             {empleados.map((empleado) => {
               const fila = borrador[empleado.id]
               return (
                 <tr key={empleado.id}>
                   <td className={claseCeldaTabla}>
-                    <p className="font-medium text-stone-900">{nombreCompleto(empleado)}</p>
-                    <p className="text-xs text-stone-400">{empleado.codigo} · {empleado.cargo}</p>
+                    <p className="font-medium text-zinc-900">{nombreCompleto(empleado)}</p>
+                    <p className="text-xs text-zinc-400">{empleado.codigo} · {empleado.cargo}</p>
                   </td>
                   <td className="px-4 py-2 w-48">
                     <select
@@ -210,7 +210,7 @@ function HojaAsistencia({
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col-reverse gap-2 border-t border-stone-200 p-4 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-2 border-t border-zinc-100 p-4 sm:flex-row sm:justify-end">
         <button type="button" onClick={todosPresentes} className={claseBotonSecundario}>
           <CheckCheck size={16} />
           Marcar todos presentes
@@ -268,8 +268,8 @@ function Historial({
       </div>
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 lg:flex-row lg:items-center lg:justify-between">
-          <h2 className="font-semibold text-stone-900">Historial</h2>
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 lg:flex-row lg:items-center lg:justify-between">
+          <h2 className="font-semibold text-zinc-900">Historial</h2>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:flex">
             <input type="month" value={mes} onChange={(e) => { setMes(e.target.value); setPagina(1) }} className={`${claseInput} lg:w-44`} aria-label="Mes" />
             <select value={filtroEmpleado} onChange={(e) => { setFiltroEmpleado(e.target.value); setPagina(1) }} className={`${claseInput} lg:w-52`} aria-label="Filtrar por empleado">
@@ -290,7 +290,7 @@ function Historial({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Fecha</th>
                   <th className={claseCabeceraTabla}>Empleado</th>
@@ -300,16 +300,16 @@ function Historial({
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map((registro) => {
                   const empleado = porId.get(registro.empleadoId)
                   return (
-                    <tr key={registro.id} className="hover:bg-stone-50/60">
+                    <tr key={registro.id} className="hover:bg-zinc-50/60">
                       <td className={claseCeldaTabla}>{formatoFecha(registro.fecha)}</td>
-                      <td className={`${claseCeldaTabla} font-medium text-stone-900`}>{empleado ? nombreCompleto(empleado) : '—'}</td>
+                      <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>{empleado ? nombreCompleto(empleado) : '—'}</td>
                       <td className={claseCeldaTabla}><InsigniaAsistencia estado={registro.estado} /></td>
                       <td className={`${claseCeldaTabla} text-right`}>{formatoCantidad(registro.horasExtra)}</td>
-                      <td className={`${claseCeldaTabla} text-stone-500 max-w-xs truncate`}>{registro.observaciones ?? ''}</td>
+                      <td className={`${claseCeldaTabla} text-zinc-500 max-w-xs truncate`}>{registro.observaciones ?? ''}</td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         <button type="button" onClick={() => eliminar(registro)} className={claseBotonTabla}>
                           <Trash2 size={14} />

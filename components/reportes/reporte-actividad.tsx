@@ -74,11 +74,11 @@ export default function ReporteActividad({ periodo, archivo }: { periodo: Period
         vacio="No se utilizó materia prima en el período."
       />
 
-      <section className={`${claseTarjeta} print:border-stone-300`}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+      <section className={`${claseTarjeta} print:border-zinc-300`}>
+        <div className="flex flex-col gap-3 border-b border-zinc-100 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="font-semibold text-stone-900">Bitácora de actividad</h2>
-            <p className="text-xs text-stone-500 mt-0.5">Todo lo registrado en el período, de lo más reciente a lo más antiguo. Pulse el documento para ver de dónde salió.</p>
+            <h2 className="font-semibold text-zinc-900">Bitácora de actividad</h2>
+            <p className="text-xs text-zinc-500 mt-0.5">Todo lo registrado en el período, de lo más reciente a lo más antiguo. Pulse el documento para ver de dónde salió.</p>
           </div>
           <div className="flex gap-2 print:hidden">
             <select value={modulo} onChange={(e) => { setModulo(e.target.value as ModuloActividad | ''); setPagina(1) }} className={`${claseInput} h-9 sm:w-44`} aria-label="Filtrar por módulo">
@@ -94,12 +94,12 @@ export default function ReporteActividad({ periodo, archivo }: { periodo: Period
           </div>
         </div>
         {filtrados.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-stone-400">No hay actividad registrada en el período.</p>
+          <p className="px-5 py-6 text-sm text-zinc-400">No hay actividad registrada en el período.</p>
         ) : (
           <>
             <div className="overflow-x-auto print:overflow-visible">
               <table className="w-full min-w-[860px]">
-                <thead className="bg-stone-50">
+                <thead className="bg-zinc-50/70">
                   <tr>
                     <th className={claseCabeceraTabla}>Fecha</th>
                     <th className={claseCabeceraTabla}>Módulo</th>
@@ -108,22 +108,22 @@ export default function ReporteActividad({ periodo, archivo }: { periodo: Period
                     <th className={claseCabeceraTabla}>Origen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="divide-y divide-zinc-100">
                   {visibles.map((e) => (
                     <tr key={e.clave} className="align-top">
                       <td className={claseCeldaTabla}>{formatoFecha(e.fecha)}</td>
                       <td className={claseCeldaTabla}>
-                        <span className="rounded bg-stone-100 px-1.5 py-0.5 text-xs font-medium text-stone-600">{ETIQUETAS_MODULO[e.modulo]}</span>
+                        <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs font-medium text-zinc-600">{ETIQUETAS_MODULO[e.modulo]}</span>
                       </td>
                       <td className={`${claseCeldaTabla} whitespace-normal`}>
-                        <p className="font-medium text-stone-900">{e.titulo}</p>
-                        <p className="text-xs text-stone-500 mt-0.5">{e.detalle}</p>
+                        <p className="font-medium text-zinc-900">{e.titulo}</p>
+                        <p className="text-xs text-zinc-500 mt-0.5">{e.detalle}</p>
                       </td>
                       <td className={`${claseCeldaTabla} text-right ${e.monto !== undefined && e.monto < 0 ? 'text-red-600' : ''}`}>
                         {e.monto === undefined ? '—' : formatoCordobas(e.monto)}
                       </td>
                       <td className={claseCeldaTabla}>
-                        <Link href={e.href} className="inline-flex items-center gap-1 font-mono text-xs text-stone-700 underline-offset-2 hover:underline">
+                        <Link href={e.href} className="inline-flex items-center gap-1 font-mono text-xs text-zinc-700 underline-offset-2 hover:underline">
                           {e.documento}
                           <ExternalLink size={12} className="print:hidden" />
                         </Link>

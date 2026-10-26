@@ -102,7 +102,7 @@ export default function NotificacionesVista() {
       </div>
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 lg:flex-row lg:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 lg:flex-row lg:items-center">
           <div role="tablist" aria-label="Filtrar notificaciones" className="flex gap-1 overflow-x-auto">
             {(Object.keys(FILTROS) as Filtro[]).map((f) => (
               <button
@@ -111,7 +111,7 @@ export default function NotificacionesVista() {
                 role="tab"
                 aria-selected={filtro === f}
                 onClick={() => { setFiltro(f); setPagina(1) }}
-                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition ${filtro === f ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100'}`}
+                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition ${filtro === f ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:bg-zinc-100'}`}
               >
                 {FILTROS[f]}
                 {f === 'sin_leer' && sinLeer > 0 && <span className="ml-1.5 text-xs opacity-80">{sinLeer}</span>}
@@ -134,24 +134,24 @@ export default function NotificacionesVista() {
             descripcion={notificaciones.length ? 'Pruebe con otro filtro o búsqueda.' : 'Aquí aparecerán las ventas, compras, producción y alertas de inventario.'}
           />
         ) : (
-          <ul className="divide-y divide-stone-100">
+          <ul className="divide-y divide-zinc-100">
             {visibles.map((n) => (
               <li key={n.clave} className={`flex gap-3 px-4 py-3.5 ${n.leida ? '' : 'bg-sky-50/50'}`}>
                 <IconoNotificacion notificacion={n} />
                 <button type="button" onClick={() => abrir(n)} className="min-w-0 flex-1 text-left">
-                  <p className={`text-sm ${n.leida ? 'text-stone-700' : 'font-semibold text-stone-900'}`}>{n.titulo}</p>
-                  <p className="mt-0.5 text-xs text-stone-500">{n.detalle}</p>
+                  <p className={`text-sm ${n.leida ? 'text-zinc-700' : 'font-semibold text-zinc-900'}`}>{n.titulo}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500">{n.detalle}</p>
                   <OrigenNotificacion notificacion={n} />
                 </button>
                 <div className="flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-start">
-                  <Link href={n.href} onClick={() => marcarLeidas([n.clave])} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-stone-700 hover:bg-stone-100">
+                  <Link href={n.href} onClick={() => marcarLeidas([n.clave])} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100">
                     <ExternalLink size={13} />
                     Ver origen
                   </Link>
                   <button
                     type="button"
                     onClick={() => (n.leida ? marcarNoLeida(n.clave) : marcarLeidas([n.clave]))}
-                    className="rounded-md px-2 py-1 text-xs text-stone-500 hover:bg-stone-100 hover:text-stone-800"
+                    className="rounded-md px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
                   >
                     {n.leida ? 'Marcar no leída' : 'Marcar leída'}
                   </button>

@@ -90,7 +90,7 @@ export default function ClientesVista() {
       />
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-center">
           <Buscador valor={busqueda} onCambio={(v) => { setBusqueda(v); setPagina(1) }} placeholder="Buscar por nombre, cédula, teléfono o correo" />
           <select value={filtroEstado} onChange={(e) => { setFiltroEstado(e.target.value as FiltroEstado); setPagina(1) }} className={`${claseInput} sm:w-44 sm:ml-auto`} aria-label="Filtrar por estado">
             <option value="activos">Activos</option>
@@ -108,7 +108,7 @@ export default function ClientesVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[860px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Código</th>
                   <th className={claseCabeceraTabla}>Cliente</th>
@@ -119,23 +119,23 @@ export default function ClientesVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map((cliente) => {
                   const historial = historialPorCliente.get(cliente.id)
                   return (
-                    <tr key={cliente.id} className={`hover:bg-stone-50/60 ${cliente.activo ? '' : 'opacity-60'}`}>
+                    <tr key={cliente.id} className={`hover:bg-zinc-50/60 ${cliente.activo ? '' : 'opacity-60'}`}>
                       <td className={`${claseCeldaTabla} font-mono text-xs`}>{cliente.codigo}</td>
                       <td className={claseCeldaTabla}>
-                        <p className="font-medium text-stone-900">{cliente.nombre}</p>
-                        {cliente.identificacion && <p className="text-xs text-stone-400">{cliente.identificacion}</p>}
+                        <p className="font-medium text-zinc-900">{cliente.nombre}</p>
+                        {cliente.identificacion && <p className="text-xs text-zinc-400">{cliente.identificacion}</p>}
                       </td>
                       <td className={claseCeldaTabla}>
-                        <p>{cliente.telefono ?? <span className="text-stone-400">—</span>}</p>
-                        {cliente.correo && <p className="text-xs text-stone-400">{cliente.correo}</p>}
+                        <p>{cliente.telefono ?? <span className="text-zinc-400">—</span>}</p>
+                        {cliente.correo && <p className="text-xs text-zinc-400">{cliente.correo}</p>}
                       </td>
                       <td className={`${claseCeldaTabla} text-right`}>{historial?.ventas.length ?? 0}</td>
-                      <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCordobas(historial?.total ?? 0)}</td>
-                      <td className={claseCeldaTabla}>{historial?.ultima ? formatoFecha(historial.ultima) : <span className="text-stone-400">—</span>}</td>
+                      <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(historial?.total ?? 0)}</td>
+                      <td className={claseCeldaTabla}>{historial?.ultima ? formatoFecha(historial.ultima) : <span className="text-zinc-400">—</span>}</td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         <div className="inline-flex gap-1">
                           <button type="button" onClick={() => setModal({ tipo: 'detalle', clienteId: cliente.id })} className={claseBotonTabla}>
@@ -215,9 +215,9 @@ function DetalleCliente({
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-xs text-stone-400">{cliente.codigo}</p>
-          <p className="text-lg font-semibold text-stone-900">{cliente.nombre}</p>
-          {!cliente.activo && <p className="text-xs text-stone-500 mt-0.5">Inactivo: no aparece al registrar ventas.</p>}
+          <p className="font-mono text-xs text-zinc-400">{cliente.codigo}</p>
+          <p className="text-lg font-semibold text-zinc-900">{cliente.nombre}</p>
+          {!cliente.activo && <p className="text-xs text-zinc-500 mt-0.5">Inactivo: no aparece al registrar ventas.</p>}
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" disabled={procesando} onClick={cambiarEstado} className={claseBotonSecundario}>
@@ -245,19 +245,19 @@ function DetalleCliente({
 
       {cliente.notas && (
         <div>
-          <p className="text-xs text-stone-500 mb-1">Notas</p>
-          <p className="text-sm text-stone-700 whitespace-pre-line">{cliente.notas}</p>
+          <p className="text-xs text-zinc-500 mb-1">Notas</p>
+          <p className="text-sm text-zinc-700 whitespace-pre-line">{cliente.notas}</p>
         </div>
       )}
 
       <div>
-        <h3 className="text-sm font-semibold text-stone-900 mb-2">Últimas compras</h3>
+        <h3 className="text-sm font-semibold text-zinc-900 mb-2">Últimas compras</h3>
         {recientes.length === 0 ? (
-          <p className="text-sm text-stone-400">Este cliente aún no tiene compras.</p>
+          <p className="text-sm text-zinc-400">Este cliente aún no tiene compras.</p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-stone-200">
+          <div className="overflow-x-auto rounded-lg border border-zinc-200">
             <table className="w-full min-w-[420px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Fecha</th>
                   <th className={claseCabeceraTabla}>Venta</th>
@@ -265,7 +265,7 @@ function DetalleCliente({
                   <th className={claseCabeceraTabla}>Estado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {recientes.map((venta) => (
                   <tr key={venta.id}>
                     <td className={claseCeldaTabla}>{formatoFecha(venta.fecha)}</td>

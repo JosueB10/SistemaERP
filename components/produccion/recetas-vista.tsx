@@ -101,7 +101,7 @@ export default function RecetasVista() {
       </div>
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-center">
           <Buscador valor={busqueda} onCambio={(v) => { setBusqueda(v); setPagina(1) }} placeholder="Buscar producto o materia prima" />
           <select value={filtro} onChange={(e) => setFiltro(e.target.value as FiltroReceta)} className={`${claseInput} sm:w-48 sm:ml-auto`} aria-label="Filtrar por receta">
             <option value="">Todos los productos</option>
@@ -115,7 +115,7 @@ export default function RecetasVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[960px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Producto</th>
                   <th className={claseCabeceraTabla}>Materia prima por unidad</th>
@@ -125,20 +125,20 @@ export default function RecetasVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map(({ producto, receta, definida, costo, capacidad, materiales }) => (
-                  <tr key={producto.id} className="hover:bg-stone-50/60 align-top">
+                  <tr key={producto.id} className="hover:bg-zinc-50/60 align-top">
                     <td className={claseCeldaTabla}>
-                      <p className="font-medium text-stone-900">{producto.nombre}</p>
-                      <p className="font-mono text-xs text-stone-400">{producto.sku}{receta ? ` · v${receta.version}` : ''}</p>
+                      <p className="font-medium text-zinc-900">{producto.nombre}</p>
+                      <p className="font-mono text-xs text-zinc-400">{producto.sku}{receta ? ` · v${receta.version}` : ''}</p>
                     </td>
                     <td className={`${claseCeldaTabla} whitespace-normal`}>
                       {definida ? (
                         <ul className="space-y-0.5 text-xs">
                           {materiales.map((m) => (
                             <li key={m.materiaPrimaId}>
-                              <span className="font-medium text-stone-800">{formatoCantidad(m.porUnidad)} {m.unidad}</span>{' '}
-                              <span className="text-stone-500">{m.nombre}</span>
+                              <span className="font-medium text-zinc-800">{formatoCantidad(m.porUnidad)} {m.unidad}</span>{' '}
+                              <span className="text-zinc-500">{m.nombre}</span>
                             </li>
                           ))}
                         </ul>
@@ -147,8 +147,8 @@ export default function RecetasVista() {
                       )}
                     </td>
                     <td className={`${claseCeldaTabla} text-right`}>{definida ? formatoCordobas(costo) : '—'}</td>
-                    <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCordobas(producto.costoProduccion)}</td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold ${capacidad === 0 ? 'text-red-600' : 'text-stone-900'}`}>
+                    <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCordobas(producto.costoProduccion)}</td>
+                    <td className={`${claseCeldaTabla} text-right font-semibold ${capacidad === 0 ? 'text-red-600' : 'text-zinc-900'}`}>
                       {capacidad === null ? '—' : `${formatoCantidad(capacidad)} und`}
                     </td>
                     <td className={`${claseCeldaTabla} text-right`}>

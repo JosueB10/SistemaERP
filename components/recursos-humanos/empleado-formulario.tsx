@@ -144,7 +144,7 @@ export default function EmpleadoFormulario({
       <ErrorFormulario mensaje={errorGeneral} />
 
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400 mb-3">Datos personales</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400 mb-3">Datos personales</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {texto('codigo', 'Código', { requerido: true, mayusculas: true, placeholder: 'EMP-001' })}
         {texto('cedula', 'Cédula', { mayusculas: true, placeholder: '001-010190-0001A' })}
@@ -156,8 +156,8 @@ export default function EmpleadoFormulario({
         </div>
       </section>
 
-      <section className="border-t border-stone-200 pt-5">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-400 mb-3">Datos laborales</h3>
+      <section className="border-t border-zinc-100 pt-5">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400 mb-3">Datos laborales</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {texto('cargo', 'Cargo', { requerido: true, lista: 'rrhh-cargos', placeholder: 'Operario de producción' })}
         {texto('area', 'Área', { lista: 'rrhh-areas', placeholder: 'Producción' })}

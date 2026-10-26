@@ -36,8 +36,8 @@ export default function ReporteFlujo({ periodo, archivo }: { periodo: Periodo; a
 
       {mesesGrafico.length > 1 && (
         <section className={`${claseTarjeta} p-5 break-inside-avoid`}>
-          <h2 className="font-semibold text-stone-900">Entradas y salidas por mes</h2>
-          <p className="text-xs text-stone-500 mb-5">Montos con IVA, tal como entró o salió el dinero{flujo.length > mesesGrafico.length ? ' · últimos 24 meses del período' : ''}</p>
+          <h2 className="font-semibold text-zinc-900">Entradas y salidas por mes</h2>
+          <p className="text-xs text-zinc-500 mb-5">Montos con IVA, tal como entró o salió el dinero{flujo.length > mesesGrafico.length ? ' · últimos 24 meses del período' : ''}</p>
           <GraficoColumnas
             descripcion="Entradas y salidas por mes"
             categorias={mesesGrafico.map((f) => etiquetaMesCorta(f.mes))}

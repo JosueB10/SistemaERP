@@ -164,8 +164,8 @@ export default function NuevaCompra() {
           <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mx-auto mb-3">
             <CheckCircle2 size={24} className="text-emerald-600" />
           </div>
-          <p className="text-lg font-semibold text-stone-900">Compra {codigoCompra(registrada.id)} registrada</p>
-          <p className="text-sm text-stone-500 mt-1">Total: {formatoCordobas(registrada.total)}. La materia prima ya entró al inventario y se registró el gasto.</p>
+          <p className="text-lg font-semibold text-zinc-900">Compra {codigoCompra(registrada.id)} registrada</p>
+          <p className="text-sm text-zinc-500 mt-1">Total: {formatoCordobas(registrada.total)}. La materia prima ya entró al inventario y se registró el gasto.</p>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Link href={`/compras?detalle=${encodeURIComponent(registrada.id)}`} className={claseBotonSecundario}>Ver compra</Link>
             <button type="button" onClick={reiniciar} className={claseBotonPrimario}><Plus size={16} />Nueva compra</button>
@@ -220,8 +220,8 @@ export default function NuevaCompra() {
           </section>
 
           <section className={claseTarjeta}>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 px-5 py-4">
-              <h2 className="font-semibold text-stone-900">Materia prima</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4">
+              <h2 className="font-semibold text-zinc-900">Materia prima</h2>
               <div className="flex flex-wrap gap-2">
                 {stockBajoPendiente && (
                   <button type="button" onClick={agregarStockBajo} className={`${claseBotonSecundario} h-9`}>
@@ -236,11 +236,11 @@ export default function NuevaCompra() {
             </div>
 
             {materiasPrimas.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-stone-500">Primero registre materias primas en Inventario.</p>
+              <p className="px-5 py-8 text-center text-sm text-zinc-500">Primero registre materias primas en Inventario.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px]">
-                  <thead className="bg-stone-50">
+                  <thead className="bg-zinc-50/70">
                     <tr>
                       <th className={claseCabeceraTabla}>Materia prima</th>
                       <th className={`${claseCabeceraTabla} w-32`}>Cantidad</th>
@@ -249,7 +249,7 @@ export default function NuevaCompra() {
                       <th className="w-10" />
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-stone-100">
+                  <tbody className="divide-y divide-zinc-100">
                     {lineas.map((linea) => {
                       const materia = materiaPorId.get(linea.materiaPrimaId)
                       const cantidad = Number(linea.cantidad)
@@ -271,10 +271,10 @@ export default function NuevaCompra() {
                             {errores[linea.clave] ? (
                               <p className="text-xs text-red-600 mt-1">{errores[linea.clave]}</p>
                             ) : materia ? (
-                              <p className="text-xs text-stone-400 mt-1">
+                              <p className="text-xs text-zinc-400 mt-1">
                                 Stock {formatoCantidad(materia.existencias)} → {formatoCantidad(redondear3(materia.existencias + (cantidad > 0 ? cantidad : 0)))} {ABREVIATURAS_UNIDAD[materia.unidad]}
                                 {' · '}costo {formatoCordobas(materia.costoUnitario)}
-                                {costoNuevo !== null && costoNuevo !== materia.costoUnitario && <> → <span className="text-stone-600">{formatoCordobas(costoNuevo)}</span></>}
+                                {costoNuevo !== null && costoNuevo !== materia.costoUnitario && <> → <span className="text-zinc-600">{formatoCordobas(costoNuevo)}</span></>}
                               </p>
                             ) : null}
                           </td>
@@ -284,14 +284,14 @@ export default function NuevaCompra() {
                           <td className="px-3 py-2">
                             <input type="number" min="0" step="0.01" inputMode="decimal" value={linea.costo} onChange={(e) => cambiarLinea(linea.clave, 'costo', e.target.value)} className={claseInput} aria-label="Costo unitario" />
                           </td>
-                          <td className="px-3 py-2 text-right text-sm font-medium text-stone-900 leading-10 whitespace-nowrap">
+                          <td className="px-3 py-2 text-right text-sm font-medium text-zinc-900 leading-10 whitespace-nowrap">
                             {formatoCordobas(valida ? cantidad * costo : 0)}
                           </td>
                           <td className="px-2 py-2">
                             <button
                               type="button"
                               onClick={() => setLineas((actual) => (actual.length > 1 ? actual.filter((l) => l.clave !== linea.clave) : [nuevaLinea()]))}
-                              className="h-10 w-8 flex items-center justify-center text-stone-400 hover:text-red-600"
+                              className="h-10 w-8 flex items-center justify-center text-zinc-400 hover:text-red-600"
                               aria-label="Quitar línea"
                             >
                               <Trash2 size={16} />
@@ -312,14 +312,14 @@ export default function NuevaCompra() {
         </div>
 
         <aside className={`${claseTarjeta} p-5 space-y-5 self-start xl:sticky xl:top-6`}>
-          <h2 className="font-semibold text-stone-900">Resumen</h2>
+          <h2 className="font-semibold text-zinc-900">Resumen</h2>
 
           <Campo etiqueta="Descuento (C$)" htmlFor="compra-descuento">
             <input id="compra-descuento" type="number" min="0" step="0.01" inputMode="decimal" value={descuentoTexto} onChange={(e) => { setDescuentoTexto(e.target.value); setErrorGeneral(null) }} placeholder="0.00" className={claseInput} />
           </Campo>
 
-          <label className="flex items-center gap-2 text-sm text-stone-700">
-            <input type="checkbox" checked={aplicaIva} onChange={(e) => setAplicaIva(e.target.checked)} className="h-4 w-4 rounded border-stone-300" />
+          <label className="flex items-center gap-2 text-sm text-zinc-700">
+            <input type="checkbox" checked={aplicaIva} onChange={(e) => setAplicaIva(e.target.checked)} className="h-4 w-4 rounded border-zinc-300" />
             La factura incluye IVA (15 %)
           </label>
 

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 
 import { alertasActuales } from '@/lib/actividad/eventos'
+import { useUsuario } from '@/lib/cuenta/sesion'
 import { useActividad, useFuentesActividad } from '@/lib/actividad/store'
 import { formatoCantidad, formatoCordobas, tieneStockBajo } from '@/lib/inventario/utilidades'
 import { estadoResultados, periodoDePreset } from '@/lib/reportes/calculos'
@@ -28,6 +29,7 @@ export default function DashboardPage() {
   const stockBajo = [...inventario.productos.filter((p) => p.stockMinimo > 0), ...inventario.materiasPrimas].filter(tieneStockBajo).length
   const alertas = alertasActuales(fuentes)
   const recientes = actividad.slice(0, 8)
+  const usuario = useUsuario()
 
   return (
     <>
@@ -36,12 +38,12 @@ export default function DashboardPage() {
 
       <div className="mb-8">
 
-        <h1 className="text-2xl font-bold text-stone-900">
-          Dashboard
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          {saludo()}{usuario ? `, ${usuario.nombre.split(' ')[0]}` : ''}
         </h1>
 
-        <p className="text-sm text-stone-500 mt-1">
-          Resumen general de NeumoPad
+        <p className="text-sm text-zinc-500 mt-1">
+          Así va NeumoPad este mes
         </p>
 
       </div>
@@ -88,37 +90,37 @@ export default function DashboardPage() {
 
         {/* ALERTS */}
 
-        <div className="xl:col-span-2 bg-white border border-stone-200 rounded-xl p-6">
+        <div className="xl:col-span-2 bg-white border border-zinc-200/80 rounded-2xl shadow-xs p-6">
 
           <div className="flex items-center justify-between mb-4">
 
             <div>
-              <h2 className="font-semibold text-stone-900">
+              <h2 className="font-semibold text-zinc-900">
                 Alertas
               </h2>
 
-              <p className="text-xs text-stone-400 mt-1">
+              <p className="text-xs text-zinc-400 mt-1">
                 Lo que necesita atención ahora
               </p>
             </div>
 
-            <Link href="/notificaciones" className="inline-flex items-center gap-1 text-xs font-medium text-stone-600 hover:text-stone-900">
+            <Link href="/notificaciones" className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 hover:text-zinc-900">
               Ver notificaciones <ArrowRight size={13} />
             </Link>
 
           </div>
 
           {alertas.length === 0 ? (
-            <p className="py-10 text-center text-sm text-stone-500">Sin alertas: el inventario y la producción están en orden.</p>
+            <p className="py-10 text-center text-sm text-zinc-500">Sin alertas: el inventario y la producción están en orden.</p>
           ) : (
-            <ul className="divide-y divide-stone-100">
+            <ul className="divide-y divide-zinc-100">
               {alertas.slice(0, 6).map((a) => (
                 <li key={a.clave}>
-                  <Link href={a.href} className="flex gap-3 py-3 hover:bg-stone-50 -mx-2 px-2 rounded-lg">
+                  <Link href={a.href} className="flex gap-3 py-3 hover:bg-zinc-50 -mx-2 px-2 rounded-lg">
                     <IconoNotificacion notificacion={{ clase: 'alerta', ...a, leida: true }} />
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-stone-900">{a.titulo}</p>
-                      <p className="text-xs text-stone-500">{a.detalle}</p>
+                      <p className="text-sm font-medium text-zinc-900">{a.titulo}</p>
+                      <p className="text-xs text-zinc-500">{a.detalle}</p>
                     </div>
                   </Link>
                 </li>
@@ -131,15 +133,15 @@ export default function DashboardPage() {
 
         {/* STOCK */}
 
-        <div className="bg-white border border-stone-200 rounded-xl p-6">
+        <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-xs p-6">
 
           <div className="mb-6">
 
-            <h2 className="font-semibold text-stone-900">
+            <h2 className="font-semibold text-zinc-900">
               Inventario
             </h2>
 
-            <p className="text-xs text-stone-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Estado actual
             </p>
 
@@ -175,21 +177,21 @@ export default function DashboardPage() {
 
       {/* RECENT ACTIVITY */}
 
-      <div className="bg-white border border-stone-200 rounded-xl p-6 mt-6">
+      <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-xs p-6 mt-6">
 
         <div className="mb-4 flex items-center justify-between">
 
           <div>
-            <h2 className="font-semibold text-stone-900">
+            <h2 className="font-semibold text-zinc-900">
               Actividad reciente
             </h2>
 
-            <p className="text-xs text-stone-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Últimos movimientos del sistema
             </p>
           </div>
 
-          <Link href="/reportes" className="inline-flex items-center gap-1 text-xs font-medium text-stone-600 hover:text-stone-900">
+          <Link href="/reportes" className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 hover:text-zinc-900">
             Ver bitácora completa <ArrowRight size={13} />
           </Link>
 
@@ -198,27 +200,27 @@ export default function DashboardPage() {
         {recientes.length === 0 ? (
           <div className="py-12 text-center">
 
-            <p className="text-sm text-stone-500">
+            <p className="text-sm text-zinc-500">
               No hay actividad registrada.
             </p>
 
-            <p className="text-xs text-stone-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Las compras, ventas y producciones aparecerán aquí.
             </p>
 
           </div>
         ) : (
-          <ul className="divide-y divide-stone-100">
+          <ul className="divide-y divide-zinc-100">
             {recientes.map((e) => (
               <li key={e.clave}>
-                <Link href={e.href} className="flex gap-3 py-3 hover:bg-stone-50 -mx-2 px-2 rounded-lg">
+                <Link href={e.href} className="flex gap-3 py-3 hover:bg-zinc-50 -mx-2 px-2 rounded-lg">
                   <IconoNotificacion notificacion={{ clase: 'evento', ...e, leida: true }} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-stone-900">{e.titulo}</p>
-                    <p className="text-xs text-stone-500 truncate">{e.detalle}</p>
+                    <p className="text-sm font-medium text-zinc-900">{e.titulo}</p>
+                    <p className="text-xs text-zinc-500 truncate">{e.detalle}</p>
                     <OrigenNotificacion notificacion={{ clase: 'evento', ...e, leida: true }} />
                   </div>
-                  <span className="hidden shrink-0 text-xs text-stone-400 sm:block">{haceCuanto(e.momento)}</span>
+                  <span className="hidden shrink-0 text-xs text-zinc-400 sm:block">{haceCuanto(e.momento)}</span>
                 </Link>
               </li>
             ))}
@@ -245,31 +247,31 @@ function StatCard({
 }) {
 
   return (
-    <div className="bg-white border border-stone-200 rounded-xl p-5">
+    <div className="bg-white border border-zinc-200/80 rounded-2xl shadow-xs p-5">
 
       <div className="flex items-start justify-between">
 
         <div>
 
-          <p className="text-xs text-stone-500">
+          <p className="text-[13px] font-medium text-zinc-500">
             {title}
           </p>
 
-          <p className="text-2xl font-bold text-stone-900 mt-2">
+          <p className="text-2xl font-semibold tracking-tight text-zinc-900 mt-1.5 tabular-nums">
             {value}
           </p>
 
         </div>
 
-        <div className="w-10 h-10 rounded-lg bg-stone-100 flex items-center justify-center">
-          <Icon size={19} className="text-stone-600" />
+        <div className="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center">
+          <Icon size={17} className="text-zinc-700" />
         </div>
 
       </div>
 
-      <div className="flex items-center gap-1 mt-4">
+      <div className="flex items-center gap-1 mt-3">
 
-        <span className="text-xs text-stone-400">
+        <span className="text-xs text-zinc-400">
           {change}
         </span>
 
@@ -293,24 +295,32 @@ function InventoryRow({
 }) {
 
   return (
-    <Link href={href} className="flex items-center justify-between py-3 border-b border-stone-100 last:border-0 hover:opacity-80">
+    <Link href={href} className="flex items-center justify-between py-3 border-b border-zinc-100 last:border-0 hover:opacity-80">
 
       <div className="flex items-center gap-3">
 
         <div className={`w-2 h-2 rounded-full ${
-          warning ? 'bg-amber-500' : 'bg-stone-300'
+          warning ? 'bg-amber-500' : 'bg-zinc-300'
         }`} />
 
-        <span className="text-sm text-stone-600">
+        <span className="text-sm text-zinc-600">
           {label}
         </span>
 
       </div>
 
-      <span className="text-sm font-semibold text-stone-900">
+      <span className="text-sm font-semibold text-zinc-900">
         {value}
       </span>
 
     </Link>
   )
+}
+
+
+function saludo() {
+  const hora = new Date().getHours()
+  if (hora < 12) return 'Buenos días'
+  if (hora < 19) return 'Buenas tardes'
+  return 'Buenas noches'
 }

@@ -89,7 +89,7 @@ export default function EmpleadosVista() {
       />
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 lg:flex-row lg:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 lg:flex-row lg:items-center">
           <Buscador
             valor={busqueda}
             onCambio={(valor) => {
@@ -117,7 +117,7 @@ export default function EmpleadosVista() {
             </select>
           </div>
           {hayFiltros && (
-            <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-stone-500 hover:text-stone-900 whitespace-nowrap">
+            <button type="button" onClick={limpiarFiltros} className="text-xs font-medium text-zinc-500 hover:text-zinc-900 whitespace-nowrap">
               Limpiar filtros
             </button>
           )}
@@ -132,7 +132,7 @@ export default function EmpleadosVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Código</th>
                   <th className={claseCabeceraTabla}>Empleado</th>
@@ -144,18 +144,18 @@ export default function EmpleadosVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map((empleado) => (
-                  <tr key={empleado.id} className="hover:bg-stone-50/60">
+                  <tr key={empleado.id} className="hover:bg-zinc-50/60">
                     <td className={`${claseCeldaTabla} font-mono text-xs`}>{empleado.codigo}</td>
                     <td className={claseCeldaTabla}>
-                      <p className="font-medium text-stone-900">{nombreCompleto(empleado)}</p>
-                      {empleado.cedula && <p className="text-xs text-stone-400">{empleado.cedula}</p>}
+                      <p className="font-medium text-zinc-900">{nombreCompleto(empleado)}</p>
+                      {empleado.cedula && <p className="text-xs text-zinc-400">{empleado.cedula}</p>}
                     </td>
                     <td className={claseCeldaTabla}>{empleado.cargo}</td>
-                    <td className={claseCeldaTabla}>{empleado.area || <span className="text-stone-400">—</span>}</td>
+                    <td className={claseCeldaTabla}>{empleado.area || <span className="text-zinc-400">—</span>}</td>
                     <td className={claseCeldaTabla}>{formatoFecha(empleado.fechaIngreso)}</td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCordobas(empleado.salarioMensual)}</td>
+                    <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(empleado.salarioMensual)}</td>
                     <td className={claseCeldaTabla}><InsigniaEmpleado estado={empleado.estado} /></td>
                     <td className={`${claseCeldaTabla} text-right`}>
                       <div className="inline-flex gap-1">
@@ -243,12 +243,12 @@ function DetalleEmpleado({
       <ErrorFormulario mensaje={error} />
 
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-stone-800 text-white flex items-center justify-center text-lg font-semibold shrink-0">
+        <div className="w-14 h-14 rounded-full bg-zinc-800 text-white flex items-center justify-center text-lg font-semibold shrink-0">
           {iniciales(empleado)}
         </div>
         <div className="min-w-0">
-          <p className="font-semibold text-stone-900 text-lg truncate">{nombreCompleto(empleado)}</p>
-          <p className="text-sm text-stone-500">{empleado.cargo}{empleado.area ? ` · ${empleado.area}` : ''}</p>
+          <p className="font-semibold text-zinc-900 text-lg truncate">{nombreCompleto(empleado)}</p>
+          <p className="text-sm text-zinc-500">{empleado.cargo}{empleado.area ? ` · ${empleado.area}` : ''}</p>
         </div>
         <div className="ml-auto"><InsigniaEmpleado estado={empleado.estado} /></div>
       </div>
@@ -262,7 +262,7 @@ function DetalleEmpleado({
         <DatoDetalle etiqueta="Dirección" valor={empleado.direccion} />
       </dl>
 
-      <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 border-t border-stone-200 pt-5">
+      <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 border-t border-zinc-100 pt-5">
         <DatoDetalle etiqueta="Fecha de ingreso" valor={formatoFecha(empleado.fechaIngreso)} />
         <DatoDetalle etiqueta="Antigüedad" valor={antiguedad(empleado.fechaIngreso, empleado.fechaBaja ?? hoy)} />
         <DatoDetalle etiqueta="Contrato" valor={ETIQUETAS_CONTRATO[empleado.tipoContrato]} />
@@ -271,17 +271,17 @@ function DetalleEmpleado({
         {empleado.fechaBaja && <DatoDetalle etiqueta="Fecha de baja" valor={formatoFecha(empleado.fechaBaja)} />}
       </dl>
 
-      <div className="border-t border-stone-200 pt-5">
-        <h3 className="text-sm font-semibold text-stone-900 mb-3">Asistencia reciente</h3>
+      <div className="border-t border-zinc-100 pt-5">
+        <h3 className="text-sm font-semibold text-zinc-900 mb-3">Asistencia reciente</h3>
         {recientes.length === 0 ? (
-          <p className="text-sm text-stone-400">Sin registros de asistencia.</p>
+          <p className="text-sm text-zinc-400">Sin registros de asistencia.</p>
         ) : (
-          <ul className="divide-y divide-stone-100">
+          <ul className="divide-y divide-zinc-100">
             {recientes.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-3 py-2 text-sm">
-                <span className="text-stone-600">{formatoFecha(a.fecha)}</span>
+                <span className="text-zinc-600">{formatoFecha(a.fecha)}</span>
                 <span className="flex items-center gap-3">
-                  {a.horasExtra > 0 && <span className="text-xs text-stone-500">{a.horasExtra} h extra</span>}
+                  {a.horasExtra > 0 && <span className="text-xs text-zinc-500">{a.horasExtra} h extra</span>}
                   <InsigniaAsistencia estado={a.estado} />
                 </span>
               </li>
@@ -290,7 +290,7 @@ function DetalleEmpleado({
         )}
       </div>
 
-      <div className="flex flex-col-reverse gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-2 border-t border-zinc-100 pt-4 sm:flex-row sm:justify-end">
         <button type="button" onClick={cambiarEstado} disabled={procesando} className={claseBotonSecundario}>
           {esBaja ? <UserCheck size={16} /> : <UserX size={16} />}
           {esBaja ? 'Reactivar' : 'Dar de baja'}

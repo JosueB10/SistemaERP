@@ -148,8 +148,8 @@ export default function NuevaVenta() {
               <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Clock size={24} className="text-amber-600" />
               </div>
-              <p className="text-lg font-semibold text-stone-900">Venta {codigoVenta(registrada.id)} pendiente de producción</p>
-              <p className="text-sm text-stone-500 mt-1">
+              <p className="text-lg font-semibold text-zinc-900">Venta {codigoVenta(registrada.id)} pendiente de producción</p>
+              <p className="text-sm text-zinc-500 mt-1">
                 Total por cobrar: {formatoCordobas(registrada.total)}. Aún no se descontó inventario ni se registró el ingreso:
                 se completará cuando se fabriquen las unidades que faltan. Se envió una notificación para producirlas.
               </p>
@@ -159,8 +159,8 @@ export default function NuevaVenta() {
               <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <CheckCircle2 size={24} className="text-emerald-600" />
               </div>
-              <p className="text-lg font-semibold text-stone-900">Venta {codigoVenta(registrada.id)} registrada</p>
-              <p className="text-sm text-stone-500 mt-1">Total cobrado: {formatoCordobas(registrada.total)}. El inventario y el ingreso ya se actualizaron.</p>
+              <p className="text-lg font-semibold text-zinc-900">Venta {codigoVenta(registrada.id)} registrada</p>
+              <p className="text-sm text-zinc-500 mt-1">Total cobrado: {formatoCordobas(registrada.total)}. El inventario y el ingreso ya se actualizaron.</p>
             </>
           )}
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
@@ -209,8 +209,8 @@ export default function NuevaVenta() {
           </section>
 
           <section className={claseTarjeta}>
-            <div className="flex items-center justify-between gap-3 border-b border-stone-200 px-5 py-4">
-              <h2 className="font-semibold text-stone-900">Productos</h2>
+            <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4">
+              <h2 className="font-semibold text-zinc-900">Productos</h2>
               <button type="button" onClick={() => setLineas((actual) => [...actual, nuevaLinea()])} className={`${claseBotonSecundario} h-9`}>
                 <Plus size={15} />
                 Agregar línea
@@ -218,11 +218,11 @@ export default function NuevaVenta() {
             </div>
 
             {productos.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-stone-500">Primero registre productos en Inventario.</p>
+              <p className="px-5 py-8 text-center text-sm text-zinc-500">Primero registre productos en Inventario.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px]">
-                  <thead className="bg-stone-50">
+                  <thead className="bg-zinc-50/70">
                     <tr>
                       <th className={claseCabeceraTabla}>Producto</th>
                       <th className={`${claseCabeceraTabla} w-28`}>Cantidad</th>
@@ -231,7 +231,7 @@ export default function NuevaVenta() {
                       <th className="w-10" />
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-stone-100">
+                  <tbody className="divide-y divide-zinc-100">
                     {lineas.map((linea) => {
                       const producto = productoPorId.get(linea.productoId)
                       const info = analisisPorProducto.get(linea.productoId)
@@ -261,7 +261,7 @@ export default function NuevaVenta() {
                                 </span>
                               </p>
                             ) : producto ? (
-                              <p className="text-xs text-stone-400 mt-1">Costo {formatoCordobas(producto.costoProduccion)} · lista {formatoCordobas(producto.precioVenta)}</p>
+                              <p className="text-xs text-zinc-400 mt-1">Costo {formatoCordobas(producto.costoProduccion)} · lista {formatoCordobas(producto.precioVenta)}</p>
                             ) : null}
                           </td>
                           <td className="px-3 py-2">
@@ -270,14 +270,14 @@ export default function NuevaVenta() {
                           <td className="px-3 py-2">
                             <input type="number" min="0" step="0.01" inputMode="decimal" value={linea.precio} onChange={(e) => cambiarLinea(linea.clave, 'precio', e.target.value)} className={claseInput} aria-label="Precio unitario" />
                           </td>
-                          <td className="px-3 py-2 text-right text-sm font-medium text-stone-900 leading-10 whitespace-nowrap">
+                          <td className="px-3 py-2 text-right text-sm font-medium text-zinc-900 leading-10 whitespace-nowrap">
                             {formatoCordobas(subtotalLinea > 0 ? subtotalLinea : 0)}
                           </td>
                           <td className="px-2 py-2">
                             <button
                               type="button"
                               onClick={() => setLineas((actual) => (actual.length > 1 ? actual.filter((l) => l.clave !== linea.clave) : [nuevaLinea()]))}
-                              className="h-10 w-8 flex items-center justify-center text-stone-400 hover:text-red-600"
+                              className="h-10 w-8 flex items-center justify-center text-zinc-400 hover:text-red-600"
                               aria-label="Quitar línea"
                             >
                               <Trash2 size={16} />
@@ -306,13 +306,13 @@ export default function NuevaVenta() {
 
           {analisis.materia.length > 0 && (
             <section className={`${claseTarjeta} p-5`}>
-              <h2 className="text-sm font-semibold text-stone-900">Materia prima para producir lo que falta</h2>
-              <p className="text-xs text-stone-500 mb-3">Para fabricar {formatoCantidad(totalPorProducir)} und. No se descuenta ahora: se consume al completar la orden de producción.</p>
-              <ul className="divide-y divide-stone-100 text-sm">
+              <h2 className="text-sm font-semibold text-zinc-900">Materia prima para producir lo que falta</h2>
+              <p className="text-xs text-zinc-500 mb-3">Para fabricar {formatoCantidad(totalPorProducir)} und. No se descuenta ahora: se consume al completar la orden de producción.</p>
+              <ul className="divide-y divide-zinc-100 text-sm">
                 {analisis.materia.map((m) => (
                   <li key={m.materiaPrimaId} className="flex justify-between gap-3 py-2">
-                    <span className="text-stone-700">{m.nombre}</span>
-                    <span className={m.faltante > 0 ? 'font-medium text-red-600' : 'text-stone-600'}>
+                    <span className="text-zinc-700">{m.nombre}</span>
+                    <span className={m.faltante > 0 ? 'font-medium text-red-600' : 'text-zinc-600'}>
                       {formatoCantidad(m.requerido)} {m.unidad} de {formatoCantidad(m.disponible)} disponibles
                       {m.faltante > 0 && ` · faltan ${formatoCantidad(m.faltante)}`}
                     </span>
@@ -328,14 +328,14 @@ export default function NuevaVenta() {
         </div>
 
         <aside className={`${claseTarjeta} p-5 space-y-5 self-start xl:sticky xl:top-6`}>
-          <h2 className="font-semibold text-stone-900">Resumen</h2>
+          <h2 className="font-semibold text-zinc-900">Resumen</h2>
 
           <Campo etiqueta="Descuento (C$)" htmlFor="venta-descuento">
             <input id="venta-descuento" type="number" min="0" step="0.01" inputMode="decimal" value={descuentoTexto} onChange={(e) => { setDescuentoTexto(e.target.value); setErrorGeneral(null) }} placeholder="0.00" className={claseInput} />
           </Campo>
 
-          <label className="flex items-center gap-2 text-sm text-stone-700">
-            <input type="checkbox" checked={aplicaIva} onChange={(e) => setAplicaIva(e.target.checked)} className="h-4 w-4 rounded border-stone-300" />
+          <label className="flex items-center gap-2 text-sm text-zinc-700">
+            <input type="checkbox" checked={aplicaIva} onChange={(e) => setAplicaIva(e.target.checked)} className="h-4 w-4 rounded border-zinc-300" />
             Cobrar IVA (15 %)
           </label>
 
@@ -343,7 +343,7 @@ export default function NuevaVenta() {
             {...totales}
             extra={
               subtotal > 0 && (
-                <div className="flex justify-between gap-3 text-xs text-stone-500 pt-1">
+                <div className="flex justify-between gap-3 text-xs text-zinc-500 pt-1">
                   <dt>Margen bruto estimado</dt>
                   <dd>{formatoCordobas(subtotal - descuento - costoEstimado)}</dd>
                 </div>

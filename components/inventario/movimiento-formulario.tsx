@@ -224,8 +224,8 @@ export default function MovimientoFormulario({
                   onClick={() => cambiar('sentido', sentido)}
                   className={`h-10 rounded-lg border text-sm font-medium transition ${
                     valores.sentido === sentido
-                      ? 'border-stone-900 bg-stone-900 text-white'
-                      : 'border-stone-300 bg-white text-stone-600 hover:bg-stone-50'
+                      ? 'border-zinc-900 bg-zinc-900 text-white'
+                      : 'border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-50'
                   }`}
                 >
                   {sentido === 'incremento' ? 'Aumentar existencias' : 'Disminuir existencias'}
@@ -289,7 +289,7 @@ export default function MovimientoFormulario({
       </div>
 
       {esVenta && articulo && cantidadVenta > 0 && (
-        <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 space-y-2">
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-700 space-y-2">
           <p>
             Del stock terminado: <strong>{formatoCantidad(desdeStock)} und</strong>
             {fabricadas > 0 && <> · Sin fabricar: <strong>{formatoCantidad(fabricadas)} und</strong></>}
@@ -308,7 +308,7 @@ export default function MovimientoFormulario({
           className={`rounded-lg border px-4 py-3 text-sm ${
             vistaPrevia < 0
               ? 'border-red-200 bg-red-50 text-red-700'
-              : 'border-stone-200 bg-stone-50 text-stone-700'
+              : 'border-zinc-200 bg-zinc-50 text-zinc-700'
           }`}
         >
           Existencias: <strong>{formatoCantidad(articulo.existencias)}</strong> →{' '}

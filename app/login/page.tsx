@@ -55,52 +55,72 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-stone-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        
-        {/* Logo / Marca */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-neutral-900 rounded-2xl mb-4">
-            <span className="text-white text-2xl font-bold">N</span>
+    <main className="min-h-dvh grid lg:grid-cols-2 bg-white">
+
+      {/* Marca */}
+      <section className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-zinc-950 p-12 text-white">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}
+          aria-hidden="true"
+        />
+        <div className="relative flex items-center gap-2.5">
+          <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
+            <span className="text-zinc-950 font-semibold">N</span>
           </div>
+          <span className="font-semibold text-lg">NeumoPad</span>
+        </div>
 
-          <h1 className="text-3xl font-bold text-neutral-900">
-            NeumoPad
+        <div className="relative max-w-md">
+          <h1 className="text-4xl font-semibold tracking-tight leading-tight">
+            Toda la operación del taller, en un solo lugar.
           </h1>
-
-          <p className="text-neutral-500 mt-2">
-            Sistema de gestión empresarial
+          <p className="mt-4 text-zinc-400">
+            Ventas, inventario, producción, compras, finanzas y personal conectados entre sí.
           </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
-          
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-neutral-900">
+        <p className="relative text-xs text-zinc-500">
+          © 2026 NeumoPad. Sistema administrativo.
+        </p>
+      </section>
+
+      {/* Formulario */}
+      <section className="flex items-center justify-center px-6 py-12 bg-zinc-50 lg:bg-white">
+        <div className="w-full max-w-sm">
+
+          <div className="mb-8 lg:hidden flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-zinc-900 rounded-lg flex items-center justify-center">
+              <span className="text-white font-semibold">N</span>
+            </div>
+            <span className="font-semibold text-lg text-zinc-900">NeumoPad</span>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
               Iniciar sesión
             </h2>
 
-            <p className="text-sm text-neutral-500 mt-1">
+            <p className="text-sm text-zinc-500 mt-1.5">
               Ingresa tus credenciales para continuar
             </p>
           </div>
 
           <form className="space-y-5" onSubmit={iniciarSesion}>
-            
+
             {/* Correo */}
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-neutral-700 mb-2"
+                className="block text-sm font-medium text-zinc-700 mb-1.5"
               >
                 Correo electrónico
               </label>
 
               <div className="relative">
                 <Mail
-                  size={19}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+                  size={17}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"
                 />
 
                 <input
@@ -111,24 +131,35 @@ export default function LoginPage() {
                   value={email}
                   onChange={(evento) => setEmail(evento.target.value)}
                   placeholder="correo@ejemplo.com"
-                  className="w-full h-11 pl-10 pr-4 rounded-lg border border-stone-300 outline-none focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700 text-sm"
+                  className={`${claseCampo} pr-4`}
                 />
               </div>
             </div>
 
             {/* Contraseña */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-neutral-700 mb-2"
-              >
-                Contraseña
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-zinc-700"
+                >
+                  Contraseña
+                </label>
+
+                <button
+                  type="button"
+                  onClick={recuperarContrasena}
+                  disabled={enviando}
+                  className="text-xs font-medium text-zinc-500 hover:text-zinc-900 disabled:opacity-60"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
 
               <div className="relative">
                 <LockKeyhole
-                  size={19}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+                  size={17}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"
                 />
 
                 <input
@@ -138,34 +169,23 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(evento) => setPassword(evento.target.value)}
-                  placeholder="••••••••"
-                  className="w-full h-11 pl-10 pr-11 rounded-lg border border-stone-300 outline-none focus:border-neutral-700 focus:ring-1 focus:ring-neutral-700 text-sm"
+                  placeholder="Tu contraseña"
+                  className={`${claseCampo} pr-11`}
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700"
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
                 >
                   {showPassword ? (
-                    <EyeOff size={19} />
+                    <EyeOff size={17} />
                   ) : (
-                    <Eye size={19} />
+                    <Eye size={17} />
                   )}
                 </button>
               </div>
-            </div>
-
-            {/* Recuperar contraseña */}
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={recuperarContrasena}
-                disabled={enviando}
-                className="text-sm text-neutral-600 hover:text-neutral-900 disabled:opacity-60"
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
             </div>
 
             {aviso && <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{aviso}</p>}
@@ -175,18 +195,21 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={enviando}
-              className="flex items-center justify-center w-full h-11 rounded-lg bg-neutral-900 text-white font-medium hover:bg-neutral-800 transition disabled:opacity-60"
+              className="flex items-center justify-center w-full h-11 rounded-lg bg-zinc-900 text-white text-sm font-medium shadow-xs hover:bg-zinc-800 active:scale-[0.99] transition disabled:opacity-60"
             >
               {enviando ? 'Validando…' : 'Iniciar sesión'}
             </button>
 
           </form>
-        </div>
 
-        <p className="text-center text-xs text-neutral-400 mt-6">
-          © 2026 NeumoPad. Sistema administrativo.
-        </p>
-      </div>
+          <p className="text-center text-xs text-zinc-400 mt-10 lg:hidden">
+            © 2026 NeumoPad. Sistema administrativo.
+          </p>
+        </div>
+      </section>
     </main>
   )
 }
+
+const claseCampo =
+  'w-full h-11 pl-10 rounded-lg bg-white border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-xs outline-none hover:border-zinc-300 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5 transition'

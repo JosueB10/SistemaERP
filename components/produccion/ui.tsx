@@ -20,7 +20,7 @@ const estilosOrden: Record<EstadoOrden, string> = {
   pendiente: 'bg-amber-50 text-amber-700 ring-amber-600/20',
   en_proceso: 'bg-sky-50 text-sky-700 ring-sky-600/20',
   completada: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
-  cancelada: 'bg-stone-100 text-stone-500 ring-stone-500/20'
+  cancelada: 'bg-zinc-100 text-zinc-500 ring-zinc-500/20'
 }
 
 export function InsigniaOrden({ estado }: { estado: EstadoOrden }) {
@@ -38,9 +38,9 @@ export function TablaRequerimientos({ lineas, cantidad }: { lineas: Requerimient
   const faltantes = lineas.filter((linea) => linea.faltante > 0)
   return (
     <div className="space-y-2">
-      <div className="overflow-x-auto rounded-lg border border-stone-200">
+      <div className="overflow-x-auto rounded-lg border border-zinc-200">
         <table className="w-full min-w-[560px]">
-          <thead className="bg-stone-50">
+          <thead className="bg-zinc-50/70">
             <tr>
               <th className={claseCabeceraTabla}>Materia prima</th>
               <th className={`${claseCabeceraTabla} text-right`}>Por unidad</th>
@@ -49,26 +49,26 @@ export function TablaRequerimientos({ lineas, cantidad }: { lineas: Requerimient
               <th className={`${claseCabeceraTabla} text-right`}>Costo</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-zinc-100">
             {lineas.map((linea) => (
               <tr key={linea.materiaPrimaId} className={linea.faltante > 0 ? 'bg-red-50/50' : undefined}>
                 <td className={claseCeldaTabla}>
-                  <span className="font-mono text-xs text-stone-400 mr-2">{linea.codigo}</span>
+                  <span className="font-mono text-xs text-zinc-400 mr-2">{linea.codigo}</span>
                   {linea.nombre}
                 </td>
-                <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCantidad(linea.porUnidad)} {linea.unidad}</td>
-                <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCantidad(linea.requerido)} {linea.unidad}</td>
-                <td className={`${claseCeldaTabla} text-right ${linea.faltante > 0 ? 'text-red-600 font-medium' : 'text-stone-500'}`}>
+                <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCantidad(linea.porUnidad)} {linea.unidad}</td>
+                <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCantidad(linea.requerido)} {linea.unidad}</td>
+                <td className={`${claseCeldaTabla} text-right ${linea.faltante > 0 ? 'text-red-600 font-medium' : 'text-zinc-500'}`}>
                   {formatoCantidad(linea.disponible)} {linea.unidad}
                 </td>
                 <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.costo)}</td>
               </tr>
             ))}
           </tbody>
-          <tfoot className="bg-stone-50">
+          <tfoot className="bg-zinc-50">
             <tr>
               <td colSpan={4} className={`${claseCeldaTabla} text-right font-medium`}>Costo de materia prima</td>
-              <td className={`${claseCeldaTabla} text-right font-semibold text-stone-900`}>{formatoCordobas(total)}</td>
+              <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(total)}</td>
             </tr>
           </tfoot>
         </table>

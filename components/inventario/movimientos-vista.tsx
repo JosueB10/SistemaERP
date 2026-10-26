@@ -116,7 +116,7 @@ export default function MovimientosVista() {
       </div>
 
       <div className={claseTarjeta}>
-        <div className="space-y-3 border-b border-stone-200 p-4">
+        <div className="space-y-3 border-b border-zinc-100 p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             <Buscador
               valor={busqueda}
@@ -169,11 +169,11 @@ export default function MovimientosVista() {
             </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <label className="flex items-center gap-2 text-xs text-stone-500">
+            <label className="flex items-center gap-2 text-xs text-zinc-500">
               Desde
               <input type="date" value={fechaDesde} onChange={(e) => setFechaDesde(e.target.value)} className={`${claseInput} sm:w-40`} />
             </label>
-            <label className="flex items-center gap-2 text-xs text-stone-500">
+            <label className="flex items-center gap-2 text-xs text-zinc-500">
               Hasta
               <input type="date" value={fechaHasta} onChange={(e) => setFechaHasta(e.target.value)} className={`${claseInput} sm:w-40`} />
             </label>
@@ -181,7 +181,7 @@ export default function MovimientosVista() {
               <span className="text-xs text-red-600">La fecha inicial es posterior a la final.</span>
             )}
             {hayFiltros && (
-              <button type="button" onClick={limpiarFiltros} className="sm:ml-auto text-xs font-medium text-stone-500 hover:text-stone-900">
+              <button type="button" onClick={limpiarFiltros} className="sm:ml-auto text-xs font-medium text-zinc-500 hover:text-zinc-900">
                 Limpiar filtros
               </button>
             )}
@@ -197,7 +197,7 @@ export default function MovimientosVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[980px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Fecha</th>
                   <th className={claseCabeceraTabla}>Artículo</th>
@@ -208,22 +208,22 @@ export default function MovimientosVista() {
                   <th className={claseCabeceraTabla}>Observaciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map(({ movimiento, articulo }) => {
                   const variacion = variacionMovimiento(movimiento)
                   return (
-                    <tr key={movimiento.id} className="hover:bg-stone-50/60 align-top">
+                    <tr key={movimiento.id} className="hover:bg-zinc-50/60 align-top">
                       <td className={claseCeldaTabla}>{formatoFecha(movimiento.fecha)}</td>
                       <td className={claseCeldaTabla}>
                         {articulo ? (
                           <Link href={rutaDetalle(articulo.clase, articulo.id)} className="group">
-                            <span className="block font-medium text-stone-900 group-hover:underline">{articulo.nombre}</span>
-                            <span className="block text-xs text-stone-400">
+                            <span className="block font-medium text-zinc-900 group-hover:underline">{articulo.nombre}</span>
+                            <span className="block text-xs text-zinc-400">
                               {articulo.codigo} · {ETIQUETAS_CLASE[articulo.clase]}
                             </span>
                           </Link>
                         ) : (
-                          <span className="text-stone-400">Artículo no disponible</span>
+                          <span className="text-zinc-400">Artículo no disponible</span>
                         )}
                       </td>
                       <td className={claseCeldaTabla}>
@@ -233,11 +233,11 @@ export default function MovimientosVista() {
                         {variacion >= 0 ? '+' : ''}
                         {formatoCantidad(variacion)} {articulo?.unidad}
                       </td>
-                      <td className={`${claseCeldaTabla} text-right text-stone-500`}>
+                      <td className={`${claseCeldaTabla} text-right text-zinc-500`}>
                         {formatoCantidad(movimiento.existenciasAnteriores)} → {formatoCantidad(movimiento.existenciasResultantes)}
                       </td>
                       <td className={claseCeldaTabla}>{movimiento.motivo}</td>
-                      <td className={`${claseCeldaTabla} whitespace-normal text-stone-500 max-w-xs`}>
+                      <td className={`${claseCeldaTabla} whitespace-normal text-zinc-500 max-w-xs`}>
                         {movimiento.observaciones || '—'}
                       </td>
                     </tr>

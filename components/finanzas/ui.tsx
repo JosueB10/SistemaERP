@@ -19,7 +19,7 @@ export function AvisoConexionFinanzas() {
 export function OrigenMovimiento({ movimiento }: { movimiento: MovimientoFinanciero }) {
   const documento = documentoOrigen(movimiento)
   if (!documento) {
-    return <span className="inline-flex px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-xs font-medium">{ETIQUETAS_ORIGEN[movimiento.origen]}</span>
+    return <span className="inline-flex px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 text-xs font-medium">{ETIQUETAS_ORIGEN[movimiento.origen]}</span>
   }
   return (
     <Link href={documento.href} className="inline-flex px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 text-xs font-medium hover:bg-sky-100 whitespace-nowrap">
@@ -38,7 +38,7 @@ export function BarrasCategoria({
   color?: string
   vacio: string
 }) {
-  if (filas.length === 0) return <p className="px-5 py-6 text-sm text-stone-400">{vacio}</p>
+  if (filas.length === 0) return <p className="px-5 py-6 text-sm text-zinc-400">{vacio}</p>
   const maximo = Math.max(...filas.map((f) => f.total))
   const suma = filas.reduce((t, f) => t + f.total, 0)
   return (
@@ -46,16 +46,16 @@ export function BarrasCategoria({
       {filas.map((fila) => (
         <li key={fila.etiqueta} className="text-sm">
           <div className="flex justify-between gap-3 mb-1">
-            <span className="text-stone-700 truncate">{fila.etiqueta}</span>
-            <span className="font-medium text-stone-900 whitespace-nowrap">
+            <span className="text-zinc-700 truncate">{fila.etiqueta}</span>
+            <span className="font-medium text-zinc-900 whitespace-nowrap">
               {formatoCordobas(fila.total)}
-              <span className="ml-1.5 text-xs font-normal text-stone-400">{suma > 0 ? Math.round((fila.total / suma) * 100) : 0} %</span>
+              <span className="ml-1.5 text-xs font-normal text-zinc-400">{suma > 0 ? Math.round((fila.total / suma) * 100) : 0} %</span>
             </span>
           </div>
-          <div className="h-2 rounded-full bg-stone-100">
+          <div className="h-2 rounded-full bg-zinc-100">
             <div className="h-2 rounded-full" style={{ width: `${maximo > 0 ? Math.max(2, (fila.total / maximo) * 100) : 0}%`, backgroundColor: color }} />
           </div>
-          {fila.detalle && <p className="text-xs text-stone-400 mt-1">{fila.detalle}</p>}
+          {fila.detalle && <p className="text-xs text-zinc-400 mt-1">{fila.detalle}</p>}
         </li>
       ))}
     </ul>

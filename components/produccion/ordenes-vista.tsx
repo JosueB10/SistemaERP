@@ -139,7 +139,7 @@ export default function OrdenesVista() {
       </div>
 
       <div className={claseTarjeta}>
-        <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-center">
           <Buscador valor={busqueda} onCambio={(v) => { setBusqueda(v); setPagina(1) }} placeholder="Buscar por orden, producto o responsable" />
           <select value={filtroEstado} onChange={(e) => { setFiltroEstado(e.target.value as FiltroEstado); setPagina(1) }} className={`${claseInput} sm:w-48 sm:ml-auto`} aria-label="Filtrar por estado">
             <option value="abiertas">Abiertas</option>
@@ -159,7 +159,7 @@ export default function OrdenesVista() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Orden</th>
                   <th className={claseCabeceraTabla}>Producto</th>
@@ -171,24 +171,24 @@ export default function OrdenesVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {visibles.map((orden) => {
                   const producto = productoPorId.get(orden.productoId)
                   const falta = ordenAbierta(orden) ? sinMateria(orden) : undefined
                   return (
-                    <tr key={orden.id} className="hover:bg-stone-50/60">
+                    <tr key={orden.id} className="hover:bg-zinc-50/60">
                       <td className={`${claseCeldaTabla} font-mono text-xs`}>{orden.codigo}</td>
-                      <td className={`${claseCeldaTabla} font-medium text-stone-900`}>{producto?.nombre ?? 'Producto inactivo'}</td>
+                      <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>{producto?.nombre ?? 'Producto inactivo'}</td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         {orden.estado === 'completada'
                           ? `${formatoCantidad(orden.cantidadProducida)} / ${formatoCantidad(orden.cantidadPlanificada)}`
                           : formatoCantidad(orden.cantidadPlanificada)}
                       </td>
-                      <td className={claseCeldaTabla}>{responsablePorId.get(orden.empleadoId ?? '')?.nombre ?? <span className="text-stone-400">Sin asignar</span>}</td>
+                      <td className={claseCeldaTabla}>{responsablePorId.get(orden.empleadoId ?? '')?.nombre ?? <span className="text-zinc-400">Sin asignar</span>}</td>
                       <td className={claseCeldaTabla}>{orden.fechaProgramada ? formatoFecha(orden.fechaProgramada) : '—'}</td>
                       <td className={claseCeldaTabla}>
                         {falta === undefined ? (
-                          <span className="text-stone-400">—</span>
+                          <span className="text-zinc-400">—</span>
                         ) : falta === null ? (
                           <span className="text-xs text-amber-700">Sin receta</span>
                         ) : falta ? (

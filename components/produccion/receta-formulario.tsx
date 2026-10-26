@@ -112,8 +112,8 @@ export default function RecetaFormulario({
       <div>
         <div className="flex items-center justify-between mb-2">
           <div>
-            <p className="text-xs font-medium text-stone-700">Materia prima por unidad</p>
-            <p className="text-xs text-stone-400">Cantidad que lleva UN mousepad. Se descuenta al completar una orden o al vender sin stock.</p>
+            <p className="text-xs font-medium text-zinc-700">Materia prima por unidad</p>
+            <p className="text-xs text-zinc-400">Cantidad que lleva UN mousepad. Se descuenta al completar una orden o al vender sin stock.</p>
           </div>
           <button type="button" onClick={() => setLineas((actual) => [...actual, nuevaLinea()])} className={`${claseBotonSecundario} h-9 shrink-0`}>
             <Plus size={15} />
@@ -122,13 +122,13 @@ export default function RecetaFormulario({
         </div>
 
         {materiasPrimas.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-stone-300 px-4 py-6 text-center text-sm text-stone-500">
+          <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-6 text-center text-sm text-zinc-500">
             Primero registre materias primas en Inventario.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-stone-200">
+          <div className="overflow-x-auto rounded-lg border border-zinc-200">
             <table className="w-full min-w-[560px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Materia prima</th>
                   <th className={`${claseCabeceraTabla} w-40`}>Cantidad</th>
@@ -136,7 +136,7 @@ export default function RecetaFormulario({
                   <th className="w-10" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {lineas.map((linea) => {
                   const materia = porId.get(linea.materiaPrimaId)
                   return (
@@ -167,17 +167,17 @@ export default function RecetaFormulario({
                             className={`${claseInput} pr-12`}
                             aria-label="Cantidad por unidad"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-400">
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
                             {materia ? ABREVIATURAS_UNIDAD[materia.unidad] : ''}
                           </span>
                         </div>
                       </td>
-                      <td className="px-3 py-2 text-right text-sm text-stone-600 leading-10">{formatoCordobas(costoLinea(linea))}</td>
+                      <td className="px-3 py-2 text-right text-sm text-zinc-600 leading-10">{formatoCordobas(costoLinea(linea))}</td>
                       <td className="px-1 py-2">
                         <button
                           type="button"
                           onClick={() => quitarLinea(linea.clave)}
-                          className="h-10 w-9 inline-flex items-center justify-center rounded-md text-stone-400 hover:bg-red-50 hover:text-red-600"
+                          className="h-10 w-9 inline-flex items-center justify-center rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-600"
                           aria-label="Quitar materia prima"
                         >
                           <Trash2 size={15} />
@@ -187,10 +187,10 @@ export default function RecetaFormulario({
                   )
                 })}
               </tbody>
-              <tfoot className="bg-stone-50">
+              <tfoot className="bg-zinc-50">
                 <tr>
-                  <td colSpan={2} className="px-3 py-2.5 text-right text-sm font-medium text-stone-700">Costo de materia prima por unidad</td>
-                  <td className="px-3 py-2.5 text-right text-sm font-semibold text-stone-900">{formatoCordobas(costoTotal)}</td>
+                  <td colSpan={2} className="px-3 py-2.5 text-right text-sm font-medium text-zinc-700">Costo de materia prima por unidad</td>
+                  <td className="px-3 py-2.5 text-right text-sm font-semibold text-zinc-900">{formatoCordobas(costoTotal)}</td>
                   <td />
                 </tr>
               </tfoot>
@@ -199,11 +199,11 @@ export default function RecetaFormulario({
         )}
       </div>
 
-      <label className="flex items-start gap-2 text-sm text-stone-700">
-        <input type="checkbox" checked={actualizarCosto} onChange={(e) => setActualizarCosto(e.target.checked)} className="mt-0.5 h-4 w-4 accent-stone-900" />
+      <label className="flex items-start gap-2 text-sm text-zinc-700">
+        <input type="checkbox" checked={actualizarCosto} onChange={(e) => setActualizarCosto(e.target.checked)} className="mt-0.5 h-4 w-4 accent-zinc-900" />
         <span>
           Usar {formatoCordobas(costoTotal)} como costo de producción del producto
-          <span className="block text-xs text-stone-400">Costo registrado actualmente: {formatoCordobas(producto.costoProduccion)}</span>
+          <span className="block text-xs text-zinc-400">Costo registrado actualmente: {formatoCordobas(producto.costoProduccion)}</span>
         </span>
       </label>
 

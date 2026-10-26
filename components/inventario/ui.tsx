@@ -24,18 +24,18 @@ export function AvisoConexion() {
 // ---------- Clases compartidas ----------
 
 export const claseInput =
-  'w-full h-10 px-3 rounded-lg bg-white border border-stone-300 text-sm text-stone-800 outline-none focus:border-stone-500 focus:ring-2 focus:ring-stone-200 transition disabled:bg-stone-100 disabled:text-stone-500'
+  'w-full h-10 px-3 rounded-lg bg-white border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-xs outline-none hover:border-zinc-300 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-900/5 transition disabled:bg-zinc-50 disabled:text-zinc-500'
 
 export const claseBotonPrimario =
-  'inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-stone-900 text-white text-sm font-medium hover:bg-stone-700 transition disabled:opacity-50'
+  'inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-zinc-900 text-white text-sm font-medium shadow-xs hover:bg-zinc-800 active:scale-[0.98] transition disabled:opacity-50 disabled:active:scale-100'
 
 export const claseBotonSecundario =
-  'inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-white border border-stone-300 text-stone-700 text-sm font-medium hover:bg-stone-50 transition'
+  'inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-white border border-zinc-200 text-zinc-700 text-sm font-medium shadow-xs hover:bg-zinc-50 hover:text-zinc-900 active:scale-[0.98] transition'
 
 export const claseBotonTabla =
-  'inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900 transition'
+  'inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition'
 
-export const claseTarjeta = 'bg-white border border-stone-200 rounded-xl'
+export const claseTarjeta = 'bg-white border border-zinc-200/80 rounded-2xl shadow-xs'
 
 // ---------- Encabezado ----------
 
@@ -53,19 +53,19 @@ export function EncabezadoPagina({
   seccion?: { etiqueta: string; href: string }
 }) {
   return (
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         {migas && (
-          <nav className="text-xs text-stone-400 mb-1">
-            <Link href={seccion.href} className="hover:text-stone-700">
+          <nav className="text-xs text-zinc-400 mb-2">
+            <Link href={seccion.href} className="hover:text-zinc-700">
               {seccion.etiqueta}
             </Link>
             <span className="mx-1.5">/</span>
-            <span className="text-stone-600">{titulo}</span>
+            <span className="text-zinc-600">{titulo}</span>
           </nav>
         )}
-        <h1 className="text-2xl font-bold text-stone-900">{titulo}</h1>
-        <p className="text-sm text-stone-500 mt-1">{descripcion}</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">{titulo}</h1>
+        <p className="text-sm text-zinc-500 mt-1">{descripcion}</p>
       </div>
       {acciones && <div className="flex flex-wrap gap-2">{acciones}</div>}
     </div>
@@ -75,7 +75,7 @@ export function EncabezadoPagina({
 // ---------- Indicadores ----------
 
 const tonosIndicador = {
-  neutro: 'bg-stone-100 text-stone-600',
+  neutro: 'bg-zinc-100 text-zinc-700',
   positivo: 'bg-emerald-50 text-emerald-700',
   alerta: 'bg-amber-50 text-amber-700',
   peligro: 'bg-red-50 text-red-700'
@@ -98,14 +98,14 @@ export function TarjetaIndicador({
     <div className={`${claseTarjeta} p-5`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs text-stone-500">{titulo}</p>
-          <p className="text-2xl font-bold text-stone-900 mt-2 truncate">{valor}</p>
+          <p className="text-[13px] font-medium text-zinc-500">{titulo}</p>
+          <p className="text-2xl font-semibold tracking-tight text-zinc-900 mt-1.5 truncate tabular-nums">{valor}</p>
         </div>
-        <div className={`w-10 h-10 shrink-0 rounded-lg flex items-center justify-center ${tonosIndicador[tono]}`}>
-          <Icono size={19} />
+        <div className={`w-9 h-9 shrink-0 rounded-xl flex items-center justify-center ${tonosIndicador[tono]}`}>
+          <Icono size={17} />
         </div>
       </div>
-      <p className="text-xs text-stone-400 mt-4">{detalle}</p>
+      <p className="text-xs text-zinc-400 mt-3">{detalle}</p>
     </div>
   )
 }
@@ -131,7 +131,7 @@ export function InsigniaEstado({ estado }: { estado: EstadoStock }) {
 
 const estilosMovimiento: Record<TipoMovimiento, string> = {
   entrada: 'bg-emerald-50 text-emerald-700',
-  salida: 'bg-stone-100 text-stone-700',
+  salida: 'bg-zinc-100 text-zinc-700',
   ajuste: 'bg-sky-50 text-sky-700'
 }
 
@@ -145,7 +145,7 @@ export function InsigniaMovimiento({ tipo }: { tipo: TipoMovimiento }) {
 
 export function InsigniaNeutra({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-xs font-medium whitespace-nowrap">
+    <span className="inline-flex px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 text-xs font-medium whitespace-nowrap">
       {children}
     </span>
   )
@@ -173,7 +173,7 @@ export function Notificacion({ mensaje }: { mensaje: string | null }) {
   return (
     <div
       role="status"
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-3 text-sm text-white shadow-lg"
+      className="animate-aparecer fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-zinc-900 px-4 py-3 text-sm text-white shadow-xl shadow-zinc-900/20"
     >
       <CheckCircle2 size={18} className="text-emerald-400" />
       {mensaje}
@@ -216,27 +216,27 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-stone-900/50" onClick={onCerrar} aria-hidden="true" />
+      <div className="absolute inset-0 bg-zinc-950/40 backdrop-blur-[2px]" onClick={onCerrar} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-titulo"
-        className={`relative w-full ${ancho} max-h-[92vh] overflow-y-auto bg-white rounded-t-2xl sm:rounded-2xl shadow-xl`}
+        className={`animate-aparecer relative w-full ${ancho} max-h-[92vh] overflow-y-auto overscroll-contain bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl shadow-zinc-900/10 ring-1 ring-zinc-900/5`}
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-stone-200 bg-white px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-zinc-100 bg-white/95 backdrop-blur px-6 py-4">
           <div>
-            <h2 id="modal-titulo" className="font-semibold text-stone-900">
+            <h2 id="modal-titulo" className="text-base font-semibold tracking-tight text-zinc-900">
               {titulo}
             </h2>
-            {descripcion && <p className="text-xs text-stone-500 mt-1">{descripcion}</p>}
+            {descripcion && <p className="text-xs text-zinc-500 mt-1">{descripcion}</p>}
           </div>
           <button
             type="button"
             onClick={onCerrar}
-            className="text-stone-400 hover:text-stone-700 transition"
+            className="-mr-1.5 rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition"
             aria-label="Cerrar"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         <div className="px-6 py-5">{children}</div>
@@ -266,7 +266,7 @@ export function Campo({
 }) {
   return (
     <div className={className}>
-      <label htmlFor={htmlFor} className="block text-xs font-medium text-stone-700 mb-1.5">
+      <label htmlFor={htmlFor} className="block text-xs font-medium text-zinc-700 mb-1.5">
         {etiqueta}
         {requerido && <span className="text-red-500 ml-0.5">*</span>}
       </label>
@@ -274,7 +274,7 @@ export function Campo({
       {error ? (
         <p className="text-xs text-red-600 mt-1">{error}</p>
       ) : (
-        ayuda && <p className="text-xs text-stone-400 mt-1">{ayuda}</p>
+        ayuda && <p className="text-xs text-zinc-400 mt-1">{ayuda}</p>
       )}
     </div>
   )
@@ -301,7 +301,7 @@ export function PieFormulario({
   deshabilitado?: boolean
 }) {
   return (
-    <div className="flex flex-col-reverse gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:justify-end">
+    <div className="flex flex-col-reverse gap-2 border-t border-zinc-100 pt-4 sm:flex-row sm:justify-end">
       <button type="button" onClick={onCancelar} className={claseBotonSecundario}>
         Cancelar
       </button>
@@ -341,7 +341,7 @@ export function Buscador({
 }) {
   return (
     <div className="relative w-full sm:max-w-xs">
-      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
       <input
         type="search"
         value={valor}
@@ -366,7 +366,7 @@ export function Paginacion({
   onCambiar: (pagina: number) => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-t border-stone-200 px-5 py-3 text-xs text-stone-500">
+    <div className="flex items-center justify-between gap-3 border-t border-zinc-100 px-5 py-3 text-xs text-zinc-500">
       <span>
         {totalElementos} {totalElementos === 1 ? 'registro' : 'registros'}
       </span>
@@ -376,7 +376,7 @@ export function Paginacion({
             type="button"
             onClick={() => onCambiar(pagina - 1)}
             disabled={pagina <= 1}
-            className="p-1.5 rounded-md border border-stone-200 hover:bg-stone-50 disabled:opacity-40"
+            className="p-1.5 rounded-md border border-zinc-200 hover:bg-zinc-50 disabled:opacity-40"
             aria-label="Página anterior"
           >
             <ChevronLeft size={14} />
@@ -388,7 +388,7 @@ export function Paginacion({
             type="button"
             onClick={() => onCambiar(pagina + 1)}
             disabled={pagina >= totalPaginas}
-            className="p-1.5 rounded-md border border-stone-200 hover:bg-stone-50 disabled:opacity-40"
+            className="p-1.5 rounded-md border border-zinc-200 hover:bg-zinc-50 disabled:opacity-40"
             aria-label="Página siguiente"
           >
             <ChevronRight size={14} />
@@ -419,16 +419,16 @@ export function EstadoVacio({
 }) {
   return (
     <div className="py-14 text-center px-4">
-      <div className="w-12 h-12 bg-stone-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-        <Icono size={22} className="text-stone-400" />
+      <div className="w-11 h-11 bg-zinc-50 ring-1 ring-zinc-200/80 rounded-xl flex items-center justify-center mx-auto mb-3">
+        <Icono size={22} className="text-zinc-400" />
       </div>
-      <p className="text-sm font-medium text-stone-700">{titulo}</p>
-      {descripcion && <p className="text-xs text-stone-400 mt-1">{descripcion}</p>}
+      <p className="text-sm font-medium text-zinc-700">{titulo}</p>
+      {descripcion && <p className="text-xs text-zinc-400 mt-1">{descripcion}</p>}
     </div>
   )
 }
 
 export const claseCabeceraTabla =
-  'px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-stone-500 whitespace-nowrap'
+  'px-4 py-2.5 text-left text-xs font-medium text-zinc-500 whitespace-nowrap'
 
-export const claseCeldaTabla = 'px-4 py-3 text-sm text-stone-700 whitespace-nowrap'
+export const claseCeldaTabla = 'px-4 py-3 text-sm text-zinc-700 whitespace-nowrap'

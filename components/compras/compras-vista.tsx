@@ -164,10 +164,10 @@ export default function ComprasVista() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <section className={`${claseTarjeta} xl:col-span-2`}>
-          <div className="flex flex-col gap-3 border-b border-stone-200 p-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-3 border-b border-zinc-100 p-4 sm:flex-row sm:items-center">
             <Buscador valor={busqueda} onCambio={(v) => { setBusqueda(v); setPagina(1) }} placeholder="Buscar por compra, factura, proveedor o material" />
-            <p className="text-xs text-stone-500 sm:ml-auto">
-              {hayFiltros ? 'Total filtrado' : 'Total histórico'}: <span className="font-semibold text-stone-900">{formatoCordobas(totalFiltrado)}</span>
+            <p className="text-xs text-zinc-500 sm:ml-auto">
+              {hayFiltros ? 'Total filtrado' : 'Total histórico'}: <span className="font-semibold text-zinc-900">{formatoCordobas(totalFiltrado)}</span>
             </p>
           </div>
 
@@ -180,7 +180,7 @@ export default function ComprasVista() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px]">
-                <thead className="bg-stone-50">
+                <thead className="bg-zinc-50/70">
                   <tr>
                     <th className={claseCabeceraTabla}>Fecha</th>
                     <th className={claseCabeceraTabla}>Compra</th>
@@ -192,15 +192,15 @@ export default function ComprasVista() {
                     <th className={`${claseCabeceraTabla} text-right`} />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="divide-y divide-zinc-100">
                   {visibles.map((c) => (
-                    <tr key={c.id} className={`hover:bg-stone-50/60 ${c.estado === 'anulada' ? 'text-stone-400' : ''}`}>
+                    <tr key={c.id} className={`hover:bg-zinc-50/60 ${c.estado === 'anulada' ? 'text-zinc-400' : ''}`}>
                       <td className={claseCeldaTabla}>{formatoFecha(c.fecha)}</td>
                       <td className={`${claseCeldaTabla} font-mono text-xs`}>{c.codigo}</td>
-                      <td className={`${claseCeldaTabla} font-medium text-stone-900`}>{nombreProveedor(c.proveedorId)}</td>
+                      <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>{nombreProveedor(c.proveedorId)}</td>
                       <td className={claseCeldaTabla}>{c.numeroFactura ?? '—'}</td>
                       <td className={`${claseCeldaTabla} text-right`}>{c.lineas.length}</td>
-                      <td className={`${claseCeldaTabla} text-right font-semibold ${c.estado === 'anulada' ? 'line-through text-stone-400' : 'text-stone-900'}`}>{formatoCordobas(c.total)}</td>
+                      <td className={`${claseCeldaTabla} text-right font-semibold ${c.estado === 'anulada' ? 'line-through text-zinc-400' : 'text-zinc-900'}`}>{formatoCordobas(c.total)}</td>
                       <td className={claseCeldaTabla}><InsigniaDocumento anulado={c.estado === 'anulada'} texto={ETIQUETAS_ESTADO_COMPRA[c.estado]} /></td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         <button type="button" onClick={() => abrirDetalle(c.id)} className={claseBotonTabla}><Eye size={14} />Ver</button>
@@ -215,23 +215,23 @@ export default function ComprasVista() {
         </section>
 
         <section className={`${claseTarjeta} self-start`}>
-          <div className="border-b border-stone-200 px-5 py-4">
-            <h2 className="font-semibold text-stone-900">Materia prima más comprada</h2>
-            <p className="text-xs text-stone-500">{hayFiltros ? 'Según los filtros' : 'Desde el inicio'}</p>
+          <div className="border-b border-zinc-100 px-5 py-4">
+            <h2 className="font-semibold text-zinc-900">Materia prima más comprada</h2>
+            <p className="text-xs text-zinc-500">{hayFiltros ? 'Según los filtros' : 'Desde el inicio'}</p>
           </div>
           {masCompradas.length === 0 ? (
-            <p className="px-5 py-6 text-sm text-stone-400">Sin compras en el período.</p>
+            <p className="px-5 py-6 text-sm text-zinc-400">Sin compras en el período.</p>
           ) : (
-            <ul className="divide-y divide-stone-100">
+            <ul className="divide-y divide-zinc-100">
               {masCompradas.map((fila) => {
                 const materia = materiaPorId.get(fila.id)
                 return (
                   <li key={fila.id} className="px-5 py-3 text-sm">
                     <div className="flex justify-between gap-3">
-                      <span className="font-medium text-stone-900 truncate">{materia?.nombre ?? 'Materia prima inactiva'}</span>
-                      <span className="font-semibold text-stone-900 whitespace-nowrap">{formatoCordobas(fila.importe)}</span>
+                      <span className="font-medium text-zinc-900 truncate">{materia?.nombre ?? 'Materia prima inactiva'}</span>
+                      <span className="font-semibold text-zinc-900 whitespace-nowrap">{formatoCordobas(fila.importe)}</span>
                     </div>
-                    <p className="text-xs text-stone-500 mt-0.5">
+                    <p className="text-xs text-zinc-500 mt-0.5">
                       {formatoCantidad(fila.cantidad)} {materia ? ABREVIATURAS_UNIDAD[materia.unidad] : ''} · {formatoCordobas(fila.cantidad ? fila.importe / fila.cantidad : 0)} promedio
                     </p>
                   </li>

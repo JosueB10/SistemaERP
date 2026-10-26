@@ -72,7 +72,7 @@ export default function ReportesVista() {
           }
         />
 
-        <div role="tablist" aria-label="Tipo de reporte" className="mb-4 flex gap-1 overflow-x-auto border-b border-stone-200">
+        <div role="tablist" aria-label="Tipo de reporte" className="mb-4 flex gap-1 overflow-x-auto border-b border-zinc-100">
           {(Object.keys(REPORTES) as TipoReporte[]).map((tipo) => (
             <button
               key={tipo}
@@ -81,7 +81,7 @@ export default function ReportesVista() {
               aria-selected={reporte === tipo}
               onClick={() => setReporte(tipo)}
               className={`whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition ${
-                reporte === tipo ? 'border-stone-900 text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-800'
+                reporte === tipo ? 'border-zinc-900 text-zinc-900' : 'border-transparent text-zinc-500 hover:text-zinc-800'
               }`}
             >
               {REPORTES[tipo].titulo}
@@ -91,8 +91,8 @@ export default function ReportesVista() {
 
         <div className={`${claseTarjeta} p-4 mb-6 flex flex-col gap-3 lg:flex-row lg:items-end`}>
           <div className="flex-1">
-            <p className="font-semibold text-stone-900">{info.titulo}</p>
-            <p className="text-xs text-stone-500">{info.descripcion}</p>
+            <p className="font-semibold text-zinc-900">{info.titulo}</p>
+            <p className="text-xs text-zinc-500">{info.descripcion}</p>
           </div>
           {usaPeriodo ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-[560px]">
@@ -123,16 +123,16 @@ export default function ReportesVista() {
               </Campo>
             </div>
           ) : (
-            <p className="text-sm text-stone-500">Existencias al día de hoy</p>
+            <p className="text-sm text-zinc-500">Existencias al día de hoy</p>
           )}
         </div>
       </div>
 
       {/* Encabezado que solo aparece al imprimir */}
-      <div className="hidden print:block mb-6 border-b border-stone-300 pb-3">
-        <p className="text-xs uppercase tracking-wide text-stone-500">NeumoPad ERP</p>
-        <h1 className="text-xl font-bold text-stone-900">{info.titulo}</h1>
-        <p className="text-sm text-stone-600">
+      <div className="hidden print:block mb-6 border-b border-zinc-300 pb-3">
+        <p className="text-xs uppercase tracking-wide text-zinc-500">NeumoPad ERP</p>
+        <h1 className="text-xl font-bold text-zinc-900">{info.titulo}</h1>
+        <p className="text-sm text-zinc-600">
           {usaPeriodo ? textoPeriodo(periodo) : `Existencias al ${formatoFecha(fechaHoy())}`} · Generado el {formatoFecha(fechaHoy())}
         </p>
       </div>

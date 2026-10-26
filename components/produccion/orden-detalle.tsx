@@ -55,13 +55,13 @@ export default function OrdenDetalle({
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-xs text-stone-400">{orden.codigo}</p>
-          <p className="text-lg font-semibold text-stone-900">{producto?.nombre ?? 'Producto inactivo'}</p>
+          <p className="font-mono text-xs text-zinc-400">{orden.codigo}</p>
+          <p className="text-lg font-semibold text-zinc-900">{producto?.nombre ?? 'Producto inactivo'}</p>
           <div className="mt-1"><InsigniaOrden estado={orden.estado} /></div>
           {orden.ventaId && (
-            <p className="mt-2 text-xs text-stone-500">
+            <p className="mt-2 text-xs text-zinc-500">
               Para la venta{' '}
-              <Link href={`/ventas?detalle=${encodeURIComponent(orden.ventaId)}`} className="font-mono font-medium text-stone-700 underline">{codigoVenta(orden.ventaId)}</Link>
+              <Link href={`/ventas?detalle=${encodeURIComponent(orden.ventaId)}`} className="font-mono font-medium text-zinc-700 underline">{codigoVenta(orden.ventaId)}</Link>
               {orden.estado !== 'completada' && orden.estado !== 'cancelada' && ': al completar esta orden la venta se completará sola.'}
             </p>
           )}
@@ -110,20 +110,20 @@ export default function OrdenDetalle({
 
       {orden.observaciones && (
         <div>
-          <p className="text-xs text-stone-500 mb-1">Observaciones</p>
-          <p className="text-sm text-stone-700 whitespace-pre-line">{orden.observaciones}</p>
+          <p className="text-xs text-zinc-500 mb-1">Observaciones</p>
+          <p className="text-sm text-zinc-700 whitespace-pre-line">{orden.observaciones}</p>
         </div>
       )}
 
       {orden.estado === 'completada' ? (
         <div>
-          <h3 className="text-sm font-semibold text-stone-900 mb-2">Materia prima consumida</h3>
+          <h3 className="text-sm font-semibold text-zinc-900 mb-2">Materia prima consumida</h3>
           {orden.consumos.length === 0 ? (
-            <p className="text-sm text-stone-400">No se registró consumo de materia prima.</p>
+            <p className="text-sm text-zinc-400">No se registró consumo de materia prima.</p>
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-stone-200">
+            <div className="overflow-x-auto rounded-lg border border-zinc-200">
               <table className="w-full min-w-[520px]">
-                <thead className="bg-stone-50">
+                <thead className="bg-zinc-50/70">
                   <tr>
                     <th className={claseCabeceraTabla}>Materia prima</th>
                     <th className={`${claseCabeceraTabla} text-right`}>Teórico</th>
@@ -132,7 +132,7 @@ export default function OrdenDetalle({
                     <th className={`${claseCabeceraTabla} text-right`}>Costo</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="divide-y divide-zinc-100">
                   {orden.consumos.map((c) => {
                     const materia = porId.get(c.materiaPrimaId)
                     const unidad = materia ? ABREVIATURAS_UNIDAD[materia.unidad] : ''
@@ -140,9 +140,9 @@ export default function OrdenDetalle({
                     return (
                       <tr key={c.materiaPrimaId}>
                         <td className={claseCeldaTabla}>{materia?.nombre ?? 'Materia prima inactiva'}</td>
-                        <td className={`${claseCeldaTabla} text-right text-stone-500`}>{formatoCantidad(c.cantidadTeorica)} {unidad}</td>
+                        <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{formatoCantidad(c.cantidadTeorica)} {unidad}</td>
                         <td className={`${claseCeldaTabla} text-right font-medium`}>{formatoCantidad(c.cantidadReal)} {unidad}</td>
-                        <td className={`${claseCeldaTabla} text-right ${diferencia > 0 ? 'text-red-600' : diferencia < 0 ? 'text-emerald-700' : 'text-stone-400'}`}>
+                        <td className={`${claseCeldaTabla} text-right ${diferencia > 0 ? 'text-red-600' : diferencia < 0 ? 'text-emerald-700' : 'text-zinc-400'}`}>
                           {diferencia > 0 ? '+' : ''}{formatoCantidad(Math.round(diferencia * 1000) / 1000)}
                         </td>
                         <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(c.subtotal)}</td>
@@ -156,7 +156,7 @@ export default function OrdenDetalle({
         </div>
       ) : ordenAbierta(orden) && (
         <div>
-          <h3 className="text-sm font-semibold text-stone-900 mb-2">Materia prima requerida</h3>
+          <h3 className="text-sm font-semibold text-zinc-900 mb-2">Materia prima requerida</h3>
           {tieneMateriaDefinida(receta) ? (
             <TablaRequerimientos lineas={lineas} cantidad={orden.cantidadPlanificada} />
           ) : (

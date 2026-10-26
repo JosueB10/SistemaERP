@@ -110,7 +110,7 @@ export default function HistorialVista() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px]">
-                <thead className="bg-stone-50">
+                <thead className="bg-zinc-50/70">
                   <tr>
                     <th className={claseCabeceraTabla}>Fecha</th>
                     <th className={claseCabeceraTabla}>Orden</th>
@@ -122,18 +122,18 @@ export default function HistorialVista() {
                     <th className={`${claseCabeceraTabla} text-right`} />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="divide-y divide-zinc-100">
                   {visibles.map((o) => (
-                    <tr key={o.id} className="hover:bg-stone-50/60">
+                    <tr key={o.id} className="hover:bg-zinc-50/60">
                       <td className={claseCeldaTabla}>{formatoFecha(fechaReferenciaOrden(o))}</td>
                       <td className={`${claseCeldaTabla} font-mono text-xs`}>{o.codigo}</td>
                       <td className={claseCeldaTabla}>
-                        <p className="font-medium text-stone-900">{productoPorId.get(o.productoId)?.nombre ?? 'Producto inactivo'}</p>
-                        <p className="text-xs text-stone-400">{responsablePorId.get(o.empleadoId ?? '')?.nombre ?? 'Sin responsable'}</p>
+                        <p className="font-medium text-zinc-900">{productoPorId.get(o.productoId)?.nombre ?? 'Producto inactivo'}</p>
+                        <p className="text-xs text-zinc-400">{responsablePorId.get(o.empleadoId ?? '')?.nombre ?? 'Sin responsable'}</p>
                       </td>
                       <td className={`${claseCeldaTabla} text-right`}>{o.estado === 'completada' ? `${formatoCantidad(o.cantidadProducida)} und` : '—'}</td>
                       <td className={`${claseCeldaTabla} text-right`}>{o.estado === 'completada' ? formatoCordobas(o.costoMateriales) : '—'}</td>
-                      <td className={`${claseCeldaTabla} text-right text-stone-500`}>{o.estado === 'completada' ? formatoCordobas(costoUnitarioOrden(o)) : '—'}</td>
+                      <td className={`${claseCeldaTabla} text-right text-zinc-500`}>{o.estado === 'completada' ? formatoCordobas(costoUnitarioOrden(o)) : '—'}</td>
                       <td className={claseCeldaTabla}><InsigniaOrden estado={o.estado} /></td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         <button type="button" onClick={() => setDetalleId(o.id)} className={claseBotonTabla}><Eye size={14} />Ver</button>
@@ -148,20 +148,20 @@ export default function HistorialVista() {
         </section>
 
         <section className={`${claseTarjeta} self-start`}>
-          <div className="border-b border-stone-200 px-5 py-4">
-            <h2 className="font-semibold text-stone-900">Por producto</h2>
+          <div className="border-b border-zinc-100 px-5 py-4">
+            <h2 className="font-semibold text-zinc-900">Por producto</h2>
           </div>
           {porProducto.length === 0 ? (
-            <p className="px-5 py-6 text-sm text-stone-400">Sin producción en el período.</p>
+            <p className="px-5 py-6 text-sm text-zinc-400">Sin producción en el período.</p>
           ) : (
-            <ul className="divide-y divide-stone-100">
+            <ul className="divide-y divide-zinc-100">
               {porProducto.map((fila) => (
                 <li key={fila.id} className="px-5 py-3 text-sm">
                   <div className="flex justify-between gap-3">
-                    <span className="font-medium text-stone-900 truncate">{productoPorId.get(fila.id)?.nombre ?? 'Producto inactivo'}</span>
-                    <span className="font-semibold text-stone-900 whitespace-nowrap">{formatoCantidad(fila.unidades)} und</span>
+                    <span className="font-medium text-zinc-900 truncate">{productoPorId.get(fila.id)?.nombre ?? 'Producto inactivo'}</span>
+                    <span className="font-semibold text-zinc-900 whitespace-nowrap">{formatoCantidad(fila.unidades)} und</span>
                   </div>
-                  <p className="text-xs text-stone-500 mt-0.5">
+                  <p className="text-xs text-zinc-500 mt-0.5">
                     {fila.ordenes} orden(es) · {formatoCordobas(fila.costo)} · {formatoCordobas(fila.costo / fila.unidades)} c/u
                   </p>
                 </li>

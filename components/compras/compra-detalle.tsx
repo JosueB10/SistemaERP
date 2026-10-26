@@ -33,8 +33,8 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-xs text-stone-400">{compra.codigo}</p>
-          <p className="text-lg font-semibold text-stone-900">{proveedor?.nombre ?? 'Proveedor eliminado'}</p>
+          <p className="font-mono text-xs text-zinc-400">{compra.codigo}</p>
+          <p className="text-lg font-semibold text-zinc-900">{proveedor?.nombre ?? 'Proveedor eliminado'}</p>
           <div className="mt-1"><InsigniaDocumento anulado={anulada} texto={ETIQUETAS_ESTADO_COMPRA[compra.estado]} /></div>
         </div>
         {!anulada && (
@@ -47,7 +47,7 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
       </div>
 
       {anulada && (
-        <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
           Anulada{compra.anuladaEn ? ` el ${formatoFecha(compra.anuladaEn)}` : ''}{compra.motivoAnulacion ? `: ${compra.motivoAnulacion}` : '.'}
         </div>
       )}
@@ -60,9 +60,9 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
         <DatoDetalle etiqueta="Registrada" valor={compra.registradoEn ? formatoFecha(compra.registradoEn) : ''} />
       </dl>
 
-      <div className="overflow-x-auto rounded-lg border border-stone-200">
+      <div className="overflow-x-auto rounded-lg border border-zinc-200">
         <table className="w-full min-w-[520px]">
-          <thead className="bg-stone-50">
+          <thead className="bg-zinc-50/70">
             <tr>
               <th className={claseCabeceraTabla}>Materia prima</th>
               <th className={`${claseCabeceraTabla} text-right`}>Cantidad</th>
@@ -70,18 +70,18 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
               <th className={`${claseCabeceraTabla} text-right`}>Subtotal</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-zinc-100">
             {compra.lineas.map((linea) => {
               const materia = materiaPorId.get(linea.materiaPrimaId)
               return (
                 <tr key={linea.materiaPrimaId}>
                   <td className={claseCeldaTabla}>
-                    <span className="font-mono text-xs text-stone-400 mr-2">{materia?.codigo ?? '—'}</span>
+                    <span className="font-mono text-xs text-zinc-400 mr-2">{materia?.codigo ?? '—'}</span>
                     {materia?.nombre ?? 'Materia prima inactiva'}
                   </td>
                   <td className={`${claseCeldaTabla} text-right`}>{formatoCantidad(linea.cantidad)} {materia ? ABREVIATURAS_UNIDAD[materia.unidad] : ''}</td>
                   <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.costoUnitario)}</td>
-                  <td className={`${claseCeldaTabla} text-right font-medium text-stone-900`}>{formatoCordobas(linea.subtotal)}</td>
+                  <td className={`${claseCeldaTabla} text-right font-medium text-zinc-900`}>{formatoCordobas(linea.subtotal)}</td>
                 </tr>
               )
             })}
@@ -93,8 +93,8 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
         <div className="sm:max-w-xs">
           {compra.observaciones && (
             <>
-              <p className="text-xs text-stone-500 mb-1">Observaciones</p>
-              <p className="text-sm text-stone-700 whitespace-pre-line">{compra.observaciones}</p>
+              <p className="text-xs text-zinc-500 mb-1">Observaciones</p>
+              <p className="text-sm text-zinc-700 whitespace-pre-line">{compra.observaciones}</p>
             </>
           )}
         </div>

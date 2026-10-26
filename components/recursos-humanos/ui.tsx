@@ -29,7 +29,7 @@ const estilosEmpleado: Record<EstadoEmpleado, string> = {
   activo: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
   vacaciones: 'bg-sky-50 text-sky-700 ring-sky-600/20',
   suspendido: 'bg-amber-50 text-amber-700 ring-amber-600/20',
-  inactivo: 'bg-stone-100 text-stone-500 ring-stone-500/20'
+  inactivo: 'bg-zinc-100 text-zinc-500 ring-zinc-500/20'
 }
 
 export function InsigniaEmpleado({ estado }: { estado: EstadoEmpleado }) {
@@ -42,7 +42,7 @@ const estilosAsistencia: Record<EstadoAsistencia, string> = {
   ausente: 'bg-red-50 text-red-700 ring-red-600/20',
   permiso: 'bg-sky-50 text-sky-700 ring-sky-600/20',
   vacaciones: 'bg-violet-50 text-violet-700 ring-violet-600/20',
-  subsidio: 'bg-stone-100 text-stone-600 ring-stone-500/20'
+  subsidio: 'bg-zinc-100 text-zinc-600 ring-zinc-500/20'
 }
 
 export function InsigniaAsistencia({ estado }: { estado: EstadoAsistencia }) {
@@ -61,8 +61,8 @@ export function InsigniaNomina({ estado }: { estado: EstadoNomina }) {
 export function DatoDetalle({ etiqueta, valor }: { etiqueta: string; valor: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs text-stone-500">{etiqueta}</dt>
-      <dd className="text-sm text-stone-900 mt-0.5">{valor || <span className="text-stone-400">—</span>}</dd>
+      <dt className="text-xs text-zinc-500">{etiqueta}</dt>
+      <dd className="text-sm text-zinc-900 mt-0.5">{valor || <span className="text-zinc-400">—</span>}</dd>
     </div>
   )
 }

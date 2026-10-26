@@ -62,8 +62,8 @@ export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAcci
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-xs text-stone-400">{venta.codigo}</p>
-          <p className="text-lg font-semibold text-stone-900">{cliente?.nombre ?? 'Cliente de contado'}</p>
+          <p className="font-mono text-xs text-zinc-400">{venta.codigo}</p>
+          <p className="text-lg font-semibold text-zinc-900">{cliente?.nombre ?? 'Cliente de contado'}</p>
           <div className="mt-1"><InsigniaDocumento anulado={anulada} pendiente={pendiente} texto={ETIQUETAS_ESTADO_VENTA[venta.estado]} /></div>
         </div>
         {!anulada && (
@@ -86,7 +86,7 @@ export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAcci
       </div>
 
       {anulada && (
-        <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
           Anulada{venta.anuladaEn ? ` el ${formatoFecha(venta.anuladaEn)}` : ''}{venta.motivoAnulacion ? `: ${venta.motivoAnulacion}` : '.'}
         </div>
       )}
@@ -104,17 +104,17 @@ export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAcci
               const producto = productoPorId.get(linea.productoId)
               return (
                 <li key={linea.productoId} className="flex flex-col gap-1 rounded-md bg-white/70 px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-stone-800">
+                  <span className="text-zinc-800">
                     {producto?.nombre ?? 'Producto inactivo'}: {formatoCantidad(disponible)} de {formatoCantidad(linea.cantidad)} disponibles
                     {falta > 0 ? <span className="font-medium text-amber-800"> · faltan {formatoCantidad(falta)}</span> : <span className="font-medium text-emerald-700"> · listo</span>}
                   </span>
                   {falta > 0 && (ordenAbiertaProducto ? (
-                    <Link href={`/produccion?detalle=${encodeURIComponent(ordenAbiertaProducto.id)}`} className="inline-flex items-center gap-1 text-xs font-medium text-stone-700 underline">
+                    <Link href={`/produccion?detalle=${encodeURIComponent(ordenAbiertaProducto.id)}`} className="inline-flex items-center gap-1 text-xs font-medium text-zinc-700 underline">
                       <Factory size={13} />
                       {ordenAbiertaProducto.codigo} · {ETIQUETAS_ESTADO_ORDEN[ordenAbiertaProducto.estado]}
                     </Link>
                   ) : (
-                    <Link href={`/produccion?nueva=${encodeURIComponent(linea.productoId)}&cantidad=${falta}&venta=${encodeURIComponent(venta.id)}`} className="inline-flex items-center gap-1 text-xs font-medium text-stone-700 underline">
+                    <Link href={`/produccion?nueva=${encodeURIComponent(linea.productoId)}&cantidad=${falta}&venta=${encodeURIComponent(venta.id)}`} className="inline-flex items-center gap-1 text-xs font-medium text-zinc-700 underline">
                       <Factory size={13} />
                       Crear orden de producción
                     </Link>
@@ -138,9 +138,9 @@ export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAcci
         )}
       </dl>
 
-      <div className="overflow-x-auto rounded-lg border border-stone-200">
+      <div className="overflow-x-auto rounded-lg border border-zinc-200">
         <table className="w-full min-w-[520px]">
-          <thead className="bg-stone-50">
+          <thead className="bg-zinc-50/70">
             <tr>
               <th className={claseCabeceraTabla}>Producto</th>
               <th className={`${claseCabeceraTabla} text-right`}>Cantidad</th>
@@ -148,20 +148,20 @@ export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAcci
               <th className={`${claseCabeceraTabla} text-right`}>Subtotal</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-zinc-100">
             {venta.lineas.map((linea) => {
               const producto = productoPorId.get(linea.productoId)
               return (
                 <tr key={linea.productoId}>
                   <td className={claseCeldaTabla}>
-                    <span className="font-mono text-xs text-stone-400 mr-2">{producto?.sku ?? '—'}</span>
+                    <span className="font-mono text-xs text-zinc-400 mr-2">{producto?.sku ?? '—'}</span>
                     {producto?.nombre ?? 'Producto inactivo'}
                     {linea.fabricadas > 0 && <span className="ml-2 text-xs text-amber-700">({formatoCantidad(linea.fabricadas)} fabricada(s))</span>}
                     {linea.porProducir > 0 && <span className="ml-2 text-xs text-amber-700">({formatoCantidad(linea.porProducir)} por producir al registrar)</span>}
                   </td>
                   <td className={`${claseCeldaTabla} text-right`}>{formatoCantidad(linea.cantidad)}</td>
                   <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.precioUnitario)}</td>
-                  <td className={`${claseCeldaTabla} text-right font-medium text-stone-900`}>{formatoCordobas(linea.subtotal)}</td>
+                  <td className={`${claseCeldaTabla} text-right font-medium text-zinc-900`}>{formatoCordobas(linea.subtotal)}</td>
                 </tr>
               )
             })}
@@ -173,8 +173,8 @@ export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAcci
         <div className="sm:max-w-xs">
           {venta.observaciones && (
             <>
-              <p className="text-xs text-stone-500 mb-1">Observaciones</p>
-              <p className="text-sm text-stone-700 whitespace-pre-line">{venta.observaciones}</p>
+              <p className="text-xs text-zinc-500 mb-1">Observaciones</p>
+              <p className="text-sm text-zinc-700 whitespace-pre-line">{venta.observaciones}</p>
             </>
           )}
         </div>

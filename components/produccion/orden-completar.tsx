@@ -93,13 +93,13 @@ export default function OrdenCompletar({
       </div>
 
       <div>
-        <p className="text-xs font-medium text-stone-700">Materia prima consumida</p>
-        <p className="text-xs text-stone-400 mb-2">
+        <p className="text-xs font-medium text-zinc-700">Materia prima consumida</p>
+        <p className="text-xs text-zinc-400 mb-2">
           Se calcula con la receta. Ajuste el consumo real si hubo merma o sobrante; esto es lo que se descuenta del inventario.
         </p>
-        <div className="overflow-x-auto rounded-lg border border-stone-200">
+        <div className="overflow-x-auto rounded-lg border border-zinc-200">
           <table className="w-full min-w-[620px]">
-            <thead className="bg-stone-50">
+            <thead className="bg-zinc-50/70">
               <tr>
                 <th className={claseCabeceraTabla}>Materia prima</th>
                 <th className={`${claseCabeceraTabla} text-right`}>Teórico</th>
@@ -109,20 +109,20 @@ export default function OrdenCompletar({
                 <th className="w-10" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-zinc-100">
               {filas.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-5 text-center text-sm text-stone-400">El producto no tiene receta. Agregue la materia prima usada o complete sin consumo.</td></tr>
+                <tr><td colSpan={6} className="px-4 py-5 text-center text-sm text-zinc-400">El producto no tiene receta. Agregue la materia prima usada o complete sin consumo.</td></tr>
               )}
               {filas.map((fila) => {
                 const unidad = fila.materia ? ABREVIATURAS_UNIDAD[fila.materia.unidad] : ''
                 return (
                   <tr key={fila.materiaPrimaId} className="align-top text-sm">
-                    <td className="px-4 py-3 text-stone-800">
+                    <td className="px-4 py-3 text-zinc-800">
                       {fila.materia?.nombre ?? 'Materia prima inactiva'}
-                      {!fila.deReceta && <span className="ml-2 text-xs text-stone-400">(agregada)</span>}
+                      {!fila.deReceta && <span className="ml-2 text-xs text-zinc-400">(agregada)</span>}
                       {errores[fila.materiaPrimaId] && <p className="text-xs text-red-600 mt-1">{errores[fila.materiaPrimaId]}</p>}
                     </td>
-                    <td className="px-4 py-3 text-right text-stone-500 whitespace-nowrap">{formatoCantidad(fila.teorico)} {unidad}</td>
+                    <td className="px-4 py-3 text-right text-zinc-500 whitespace-nowrap">{formatoCantidad(fila.teorico)} {unidad}</td>
                     <td className="px-2 py-2">
                       <input
                         type="number"
@@ -138,11 +138,11 @@ export default function OrdenCompletar({
                         aria-label={`Consumo real de ${fila.materia?.nombre ?? 'materia prima'}`}
                       />
                     </td>
-                    <td className="px-4 py-3 text-right text-stone-500 whitespace-nowrap">{fila.materia ? `${formatoCantidad(fila.materia.existencias)} ${unidad}` : '—'}</td>
+                    <td className="px-4 py-3 text-right text-zinc-500 whitespace-nowrap">{fila.materia ? `${formatoCantidad(fila.materia.existencias)} ${unidad}` : '—'}</td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">{formatoCordobas(fila.costo)}</td>
                     <td className="px-1 py-2">
                       {!fila.deReceta && (
-                        <button type="button" onClick={() => setExtras((actual) => actual.filter((id) => id !== fila.materiaPrimaId))} className="h-9 w-9 inline-flex items-center justify-center rounded-md text-stone-400 hover:bg-red-50 hover:text-red-600" aria-label="Quitar">
+                        <button type="button" onClick={() => setExtras((actual) => actual.filter((id) => id !== fila.materiaPrimaId))} className="h-9 w-9 inline-flex items-center justify-center rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-600" aria-label="Quitar">
                           <Trash2 size={15} />
                         </button>
                       )}
@@ -151,12 +151,12 @@ export default function OrdenCompletar({
                 )
               })}
             </tbody>
-            <tfoot className="bg-stone-50">
+            <tfoot className="bg-zinc-50">
               <tr>
-                <td colSpan={4} className="px-4 py-2.5 text-right text-sm font-medium text-stone-700">
+                <td colSpan={4} className="px-4 py-2.5 text-right text-sm font-medium text-zinc-700">
                   Costo de materia prima{unidades > 0 && ` (${formatoCordobas(costoTotal / unidades)} por unidad)`}
                 </td>
-                <td className="px-4 py-2.5 text-right text-sm font-semibold text-stone-900">{formatoCordobas(costoTotal)}</td>
+                <td className="px-4 py-2.5 text-right text-sm font-semibold text-zinc-900">{formatoCordobas(costoTotal)}</td>
                 <td />
               </tr>
             </tfoot>

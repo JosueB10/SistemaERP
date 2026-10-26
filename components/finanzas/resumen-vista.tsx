@@ -74,7 +74,7 @@ export default function ResumenFinanzasVista() {
         <Campo etiqueta="Mes" htmlFor="fin-mes" className="sm:w-56">
           <input id="fin-mes" type="month" value={mes} max={fechaHoy().slice(0, 7)} onChange={(e) => setMes(e.target.value || fechaHoy().slice(0, 7))} className={claseInput} />
         </Campo>
-        <p className="text-sm text-stone-500">Mostrando <span className="font-medium text-stone-900">{etiquetaMesLarga(mes)}</span></p>
+        <p className="text-sm text-zinc-500">Mostrando <span className="font-medium text-zinc-900">{etiquetaMesLarga(mes)}</span></p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-6">
@@ -91,8 +91,8 @@ export default function ResumenFinanzasVista() {
       </div>
 
       <section className={`${claseTarjeta} p-5 mb-6`}>
-        <h2 className="font-semibold text-stone-900">Ingresos y gastos por mes</h2>
-        <p className="text-xs text-stone-500 mb-5">Últimos 12 meses hasta {etiquetaMesLarga(mes)}</p>
+        <h2 className="font-semibold text-zinc-900">Ingresos y gastos por mes</h2>
+        <p className="text-xs text-zinc-500 mb-5">Últimos 12 meses hasta {etiquetaMesLarga(mes)}</p>
         {hayDatos ? (
           <GraficoColumnas
             descripcion="Ingresos y gastos por mes"
@@ -110,31 +110,31 @@ export default function ResumenFinanzasVista() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-6">
         <section className={claseTarjeta}>
-          <div className="border-b border-stone-200 px-5 py-4">
-            <h2 className="font-semibold text-stone-900">Ingresos por categoría</h2>
-            <p className="text-xs text-stone-500">{etiquetaMesLarga(mes)}</p>
+          <div className="border-b border-zinc-100 px-5 py-4">
+            <h2 className="font-semibold text-zinc-900">Ingresos por categoría</h2>
+            <p className="text-xs text-zinc-500">{etiquetaMesLarga(mes)}</p>
           </div>
           <BarrasCategoria filas={totalesPorCategoria(ingresosMes).map((f) => ({ etiqueta: f.categoria, total: f.total }))} color={COLOR_SERIE.primaria} vacio="Sin ingresos este mes." />
         </section>
         <section className={claseTarjeta}>
-          <div className="border-b border-stone-200 px-5 py-4">
-            <h2 className="font-semibold text-stone-900">Gastos por categoría</h2>
-            <p className="text-xs text-stone-500">{etiquetaMesLarga(mes)}</p>
+          <div className="border-b border-zinc-100 px-5 py-4">
+            <h2 className="font-semibold text-zinc-900">Gastos por categoría</h2>
+            <p className="text-xs text-zinc-500">{etiquetaMesLarga(mes)}</p>
           </div>
           <BarrasCategoria filas={totalesPorCategoria(gastosMes).map((f) => ({ etiqueta: f.categoria, total: f.total }))} color={COLOR_SERIE.secundaria} vacio="Sin gastos este mes." />
         </section>
       </div>
 
       <section className={claseTarjeta}>
-        <div className="border-b border-stone-200 px-5 py-4">
-          <h2 className="font-semibold text-stone-900">Movimientos del mes</h2>
+        <div className="border-b border-zinc-100 px-5 py-4">
+          <h2 className="font-semibold text-zinc-900">Movimientos del mes</h2>
         </div>
         {recientes.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-stone-400">Sin movimientos en {etiquetaMesLarga(mes)}.</p>
+          <p className="px-5 py-6 text-sm text-zinc-400">Sin movimientos en {etiquetaMesLarga(mes)}.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px]">
-              <thead className="bg-stone-50">
+              <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Fecha</th>
                   <th className={claseCabeceraTabla}>Concepto</th>
@@ -143,14 +143,14 @@ export default function ResumenFinanzasVista() {
                   <th className={`${claseCabeceraTabla} text-right`}>Monto</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-zinc-100">
                 {recientes.map((m) => (
                   <tr key={`${m.tipo}-${m.id}`}>
                     <td className={claseCeldaTabla}>{formatoFecha(m.fecha)}</td>
-                    <td className={`${claseCeldaTabla} font-medium text-stone-900`}>{m.concepto}</td>
+                    <td className={`${claseCeldaTabla} font-medium text-zinc-900`}>{m.concepto}</td>
                     <td className={claseCeldaTabla}>{m.categoria}</td>
                     <td className={claseCeldaTabla}><OrigenMovimiento movimiento={m} /></td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold ${m.tipo === 'ingreso' ? 'text-emerald-700' : 'text-stone-900'}`}>
+                    <td className={`${claseCeldaTabla} text-right font-semibold ${m.tipo === 'ingreso' ? 'text-emerald-700' : 'text-zinc-900'}`}>
                       {m.tipo === 'ingreso' ? '+' : '-'}{formatoCordobas(m.monto)}
                     </td>
                   </tr>
