@@ -30,17 +30,31 @@ export function tieneMateriaDefinida(receta: Receta | undefined): receta is Rece
   return Boolean(receta && receta.lineas.length > 0)
 }
 
+// Materia prima comprometida por las órdenes abiertas (pendientes o en proceso), menos la orden que se edita.
+// Así dos órdenes no pueden contar con el mismo material.
+export function materiaComprometida(ordenes: OrdenProduccion[], recetas: Receta[], excluirOrdenId?: string) {
+  const comprometida = new Map<string, number>()
+  for (const orden of ordenes) {
+    if (!ordenAbierta(orden) || orden.id === excluirOrdenId) continue
+    for (const linea of recetaDeProducto(recetas, orden.productoId)?.lineas ?? []) {
+      comprometida.set(linea.materiaPrimaId, redondear3((comprometida.get(linea.materiaPrimaId) ?? 0) + linea.cantidad * orden.cantidadPlanificada))
+    }
+  }
+  return comprometida
+}
+
 export function requerimientos(
   receta: Receta | undefined,
   cantidad: number,
-  materiasPrimas: MateriaPrima[]
+  materiasPrimas: MateriaPrima[],
+  comprometida?: Map<string, number>
 ): Requerimiento[] {
   if (!receta) return []
   const porId = new Map(materiasPrimas.map((materia) => [materia.id, materia]))
   return receta.lineas.map((linea) => {
     const materia = porId.get(linea.materiaPrimaId)
     const requerido = redondear3(linea.cantidad * cantidad)
-    const disponible = materia?.existencias ?? 0
+    const disponible = Math.max(0, redondear3((materia?.existencias ?? 0) - (comprometida?.get(linea.materiaPrimaId) ?? 0)))
     const costoUnitario = materia?.costoUnitario ?? 0
     return {
       materiaPrimaId: linea.materiaPrimaId,
@@ -63,10 +77,10 @@ export function costoReceta(receta: Receta | undefined, materiasPrimas: MateriaP
 }
 
 // Unidades que se pueden fabricar con el stock actual de materia prima
-export function capacidadProduccion(receta: Receta | undefined, materiasPrimas: MateriaPrima[]) {
+export function capacidadProduccion(receta: Receta | undefined, materiasPrimas: MateriaPrima[], comprometida?: Map<string, number>) {
   if (!tieneMateriaDefinida(receta)) return null
   return Math.min(
-    ...requerimientos(receta, 1, materiasPrimas).map((linea) =>
+    ...requerimientos(receta, 1, materiasPrimas, comprometida).map((linea) =>
       linea.porUnidad > 0 ? Math.floor(linea.disponible / linea.porUnidad + 1e-9) : Infinity
     )
   )

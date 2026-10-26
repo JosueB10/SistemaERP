@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { Download, Eye, Plus, Receipt, ShoppingCart, TrendingUp, Wallet } from 'lucide-react'
+import { Clock, Download, Eye, Plus, Receipt, ShoppingCart, TrendingUp, Wallet } from 'lucide-react'
 
 import { useInventario } from '@/lib/inventario/store'
 import { coincideBusqueda, fechaHoy, formatoCantidad, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
@@ -69,6 +69,8 @@ export default function VentasVista() {
   const margenMes = delMes.reduce((t, v) => t + margenVenta(v), 0)
   const hoy = ventas.filter((v) => v.estado === 'completada' && v.fecha === fechaHoy())
 
+  const pendientes = ventas.filter((v) => v.estado === 'pendiente')
+
   const vigentes = useMemo(() => filtradas.filter((v) => v.estado === 'completada'), [filtradas])
   const totalFiltrado = vigentes.reduce((t, v) => t + v.total, 0)
 
@@ -133,6 +135,19 @@ export default function VentasVista() {
         <TarjetaIndicador titulo="Margen bruto del mes" valor={formatoCordobas(margenMes)} detalle="Venta sin IVA menos costo de producción" icono={TrendingUp} tono={margenMes < 0 ? 'peligro' : 'neutro'} />
       </div>
 
+      {pendientes.length > 0 && (
+        <div role="status" className="mb-6 flex flex-col gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-start gap-2">
+            <Clock size={16} className="mt-0.5 shrink-0" />
+            <span>
+              {pendientes.length} venta(s) pendiente(s) de producción por {formatoCordobas(pendientes.reduce((t, v) => t + v.total, 0))}.
+              No cuentan como venta ni ingreso hasta que se fabrique lo que falta.
+            </span>
+          </p>
+          <button type="button" onClick={() => { setEstado('pendiente'); setPagina(1) }} className="shrink-0 font-medium underline">Ver pendientes</button>
+        </div>
+      )}
+
       <div className={`${claseTarjeta} p-4 mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4`}>
         <Campo etiqueta="Desde" htmlFor="ventas-desde">
           <input id="ventas-desde" type="date" value={desde} onChange={(e) => { setDesde(e.target.value); setPagina(1) }} className={claseInput} />
@@ -149,6 +164,7 @@ export default function VentasVista() {
         <Campo etiqueta="Estado" htmlFor="ventas-estado">
           <select id="ventas-estado" value={estado} onChange={(e) => { setEstado(e.target.value as EstadoVenta | ''); setPagina(1) }} className={claseInput}>
             <option value="">Todas</option>
+            <option value="pendiente">Pendientes de producción</option>
             <option value="completada">Completadas</option>
             <option value="anulada">Anuladas</option>
           </select>
@@ -194,7 +210,7 @@ export default function VentasVista() {
                       <td className={`${claseCeldaTabla} text-right`}>{formatoCantidad(unidadesVenta(v))}</td>
                       <td className={claseCeldaTabla}>{v.metodoPago ? ETIQUETAS_METODO_PAGO[v.metodoPago] : '—'}</td>
                       <td className={`${claseCeldaTabla} text-right font-semibold ${v.estado === 'anulada' ? 'line-through text-stone-400' : 'text-stone-900'}`}>{formatoCordobas(v.total)}</td>
-                      <td className={claseCeldaTabla}><InsigniaDocumento anulado={v.estado === 'anulada'} texto={ETIQUETAS_ESTADO_VENTA[v.estado]} /></td>
+                      <td className={claseCeldaTabla}><InsigniaDocumento anulado={v.estado === 'anulada'} pendiente={v.estado === 'pendiente'} texto={ETIQUETAS_ESTADO_VENTA[v.estado]} /></td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         <button type="button" onClick={() => abrirDetalle(v.id)} className={claseBotonTabla}><Eye size={14} />Ver</button>
                       </td>

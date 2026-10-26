@@ -5,8 +5,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 import { registrarMovimiento, useInventario, venderProducto } from '@/lib/inventario/store'
-import { useProduccion } from '@/lib/produccion/store'
-import { recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
 import type {
   ClaseArticulo,
   SentidoAjuste,
@@ -41,7 +39,6 @@ export default function MovimientoFormulario({
   onGuardado: (mensaje: string) => void
 }) {
   const datos = useInventario()
-  const { recetas } = useProduccion()
 
   const [valores, setValores] = useState({
     fecha: fechaHoy(),
@@ -79,15 +76,11 @@ export default function MovimientoFormulario({
         variacionMovimiento({ tipo: valores.tipo, sentido: valores.sentido, cantidad: cantidadNumerica })
       : null
 
-  // Venta de producto: lo que no haya en stock se fabrica al momento descontando su materia prima
+  // Venta de producto: solo sale lo que ya está fabricado; para vender más hay que usar Ventas (queda pendiente)
   const esVenta = esProducto && valores.tipo === 'salida' && normalizarTexto(valores.motivo) === 'venta'
-  const receta = esVenta && valores.articuloId ? recetaDeProducto(recetas, valores.articuloId) : undefined
   const cantidadVenta = esVenta && articulo && Number.isInteger(cantidadNumerica) && cantidadNumerica > 0 ? cantidadNumerica : 0
   const desdeStock = articulo ? Math.min(Math.max(articulo.existencias, 0), cantidadVenta) : 0
   const fabricadas = cantidadVenta - desdeStock
-  const consumoVenta = fabricadas > 0 ? requerimientos(receta, fabricadas, datos.materiasPrimas) : []
-  const ventaSinReceta = fabricadas > 0 && !tieneMateriaDefinida(receta)
-  const ventaSinMateria = consumoVenta.some((linea) => linea.faltante > 0)
 
   const enviar = async (evento: React.FormEvent) => {
     evento.preventDefault()
@@ -104,10 +97,8 @@ export default function MovimientoFormulario({
       entero: esProducto
     })
     if (cantidad.error) nuevosErrores.cantidad = cantidad.error
-    else if (esVenta && ventaSinReceta) {
-      nuevosErrores.cantidad = `Solo hay ${formatoCantidad(articulo!.existencias)} und y el producto no tiene receta para fabricar el resto.`
-    } else if (esVenta && ventaSinMateria) {
-      nuevosErrores.cantidad = 'No hay materia prima suficiente para fabricar las unidades que faltan.'
+    else if (esVenta && fabricadas > 0) {
+      nuevosErrores.cantidad = `Solo hay ${formatoCantidad(Math.max(articulo!.existencias, 0))} und fabricadas. Para vender más, registre la venta en Ventas: quedará pendiente hasta producir lo que falta.`
     } else if (!esVenta && vistaPrevia !== null && vistaPrevia < 0) {
       nuevosErrores.cantidad = `No hay existencias suficientes. Disponible: ${formatoCantidad(articulo!.existencias)} ${articulo!.unidad}.`
     }
@@ -267,7 +258,7 @@ export default function MovimientoFormulario({
           etiqueta="Motivo"
           htmlFor="mov-motivo"
           error={errores.motivo}
-          ayuda={esProducto && valores.tipo === 'salida' ? 'Con "Venta", lo que falte en stock se fabrica y se descuenta su materia prima.' : undefined}
+          ayuda={esProducto && valores.tipo === 'salida' ? 'Con "Venta" solo sale lo que ya está fabricado.' : undefined}
           requerido
         >
           <input
@@ -301,22 +292,14 @@ export default function MovimientoFormulario({
         <div className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 space-y-2">
           <p>
             Del stock terminado: <strong>{formatoCantidad(desdeStock)} und</strong>
-            {fabricadas > 0 && <> · Se fabrican al vender: <strong>{formatoCantidad(fabricadas)} und</strong></>}
+            {fabricadas > 0 && <> · Sin fabricar: <strong>{formatoCantidad(fabricadas)} und</strong></>}
           </p>
-          {fabricadas > 0 && (ventaSinReceta ? (
+          {fabricadas > 0 && (
             <p className="text-red-600">
-              El producto no tiene receta.{' '}
-              <Link href={`/produccion/recetas?producto=${encodeURIComponent(valores.articuloId)}`} className="font-medium underline">Definir receta</Link>
+              Faltan {formatoCantidad(fabricadas)} und por fabricar.{' '}
+              <Link href="/ventas/nueva" className="font-medium underline">Registrar en Ventas como venta pendiente</Link>
             </p>
-          ) : (
-            <ul className="space-y-0.5 text-xs">
-              {consumoVenta.map((linea) => (
-                <li key={linea.materiaPrimaId} className={linea.faltante > 0 ? 'text-red-600' : 'text-stone-600'}>
-                  − {formatoCantidad(linea.requerido)} {linea.unidad} de {linea.nombre} (disponible {formatoCantidad(linea.disponible)})
-                </li>
-              ))}
-            </ul>
-          ))}
+          )}
         </div>
       )}
 

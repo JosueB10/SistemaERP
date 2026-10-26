@@ -43,11 +43,11 @@ export default function ClientesVista() {
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>('activos')
   const [modal, setModal] = useState<ModalActivo>(null)
 
-  // Solo cuentan las ventas no anuladas
+  // Solo cuentan las ventas completadas
   const historialPorCliente = useMemo(() => {
     const mapa = new Map<string, Historial>()
     ventas.forEach((venta) => {
-      if (!venta.clienteId || venta.estado === 'anulada') return
+      if (!venta.clienteId || venta.estado !== 'completada') return
       const actual = mapa.get(venta.clienteId) ?? { ventas: [], total: 0 }
       actual.ventas.push(venta)
       actual.total += venta.total
@@ -273,7 +273,7 @@ function DetalleCliente({
                       <Link href={`/ventas?detalle=${encodeURIComponent(venta.id)}`} className="hover:underline">{venta.codigo}</Link>
                     </td>
                     <td className={`${claseCeldaTabla} text-right font-medium`}>{formatoCordobas(venta.total)}</td>
-                    <td className={claseCeldaTabla}><InsigniaDocumento anulado={venta.estado === 'anulada'} texto={ETIQUETAS_ESTADO_VENTA[venta.estado]} /></td>
+                    <td className={claseCeldaTabla}><InsigniaDocumento anulado={venta.estado === 'anulada'} pendiente={venta.estado === 'pendiente'} texto={ETIQUETAS_ESTADO_VENTA[venta.estado]} /></td>
                   </tr>
                 ))}
               </tbody>

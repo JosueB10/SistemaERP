@@ -7,7 +7,7 @@ import { useInventario } from '@/lib/inventario/store'
 import { fechaHoy, formatoCantidad, validarNumero } from '@/lib/inventario/utilidades'
 import { guardarOrden, useProduccion } from '@/lib/produccion/store'
 import type { OrdenProduccion } from '@/lib/produccion/tipos'
-import { capacidadProduccion, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
+import { capacidadProduccion, materiaComprometida, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
 import { Campo, claseInput, ErrorFormulario, PieFormulario } from '../inventario/ui'
 import { TablaRequerimientos } from './ui'
 
@@ -15,22 +15,25 @@ type Errores = Partial<Record<'productoId' | 'cantidad', string>>
 
 export default function OrdenFormulario({
   orden,
+  inicial,
   onCancelar,
   onGuardado
 }: {
   orden?: OrdenProduccion
+  // Valores propuestos al crear (por ejemplo, lo que falta para una venta pendiente)
+  inicial?: { productoId: string; cantidad: number; ventaId?: string; observaciones?: string }
   onCancelar: () => void
   onGuardado: (mensaje: string) => void
 }) {
   const { productos, materiasPrimas } = useInventario()
-  const { recetas, responsables } = useProduccion()
+  const { recetas, ordenes, responsables } = useProduccion()
 
   const [valores, setValores] = useState({
-    productoId: orden?.productoId ?? '',
-    cantidad: orden ? String(orden.cantidadPlanificada) : '',
+    productoId: orden?.productoId ?? inicial?.productoId ?? '',
+    cantidad: orden ? String(orden.cantidadPlanificada) : inicial ? String(inicial.cantidad) : '',
     fechaProgramada: orden?.fechaProgramada ?? fechaHoy(),
     empleadoId: orden?.empleadoId ?? '',
-    observaciones: orden?.observaciones ?? ''
+    observaciones: orden?.observaciones ?? inicial?.observaciones ?? ''
   })
   const [errores, setErrores] = useState<Errores>({})
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
@@ -45,7 +48,12 @@ export default function OrdenFormulario({
   const receta = valores.productoId ? recetaDeProducto(recetas, valores.productoId) : undefined
   const cantidad = Number(valores.cantidad)
   const cantidadValida = Number.isInteger(cantidad) && cantidad > 0
-  const capacidad = capacidadProduccion(receta, materiasPrimas)
+  // Lo que ya reservaron las otras órdenes abiertas no está disponible para esta
+  const comprometida = materiaComprometida(ordenes, recetas, orden?.id)
+  const capacidad = capacidadProduccion(receta, materiasPrimas, comprometida)
+  const lineas = tieneMateriaDefinida(receta) ? requerimientos(receta, cantidadValida ? cantidad : 1, materiasPrimas, comprometida) : []
+  const faltantes = cantidadValida ? lineas.filter((linea) => linea.faltante > 0) : []
+  const sinMateria = capacidad === 0
   const disponibles = responsables.filter((r) => r.activo || r.id === valores.empleadoId)
 
   const enviar = async (evento: React.FormEvent) => {
@@ -54,6 +62,8 @@ export default function OrdenFormulario({
     if (!valores.productoId) nuevosErrores.productoId = 'Seleccione el producto a fabricar.'
     const numeroValido = validarNumero(valores.cantidad, { etiqueta: 'La cantidad', mayorQueCero: true, entero: true })
     if (numeroValido.error) nuevosErrores.cantidad = numeroValido.error
+    else if (sinMateria) nuevosErrores.cantidad = 'No hay materia prima disponible para fabricar este producto. Registre una compra primero.'
+    else if (faltantes.length > 0) nuevosErrores.cantidad = `Materia prima insuficiente: con el stock disponible solo se pueden fabricar ${formatoCantidad(capacidad ?? 0)} und.`
     setErrores(nuevosErrores)
     if (Object.keys(nuevosErrores).length > 0) return
 
@@ -64,6 +74,7 @@ export default function OrdenFormulario({
         cantidadPlanificada: numeroValido.valor!,
         fechaProgramada: valores.fechaProgramada,
         empleadoId: valores.empleadoId || undefined,
+        ventaId: orden ? undefined : inicial?.ventaId,
         observaciones: valores.observaciones
       },
       orden?.id
@@ -97,7 +108,7 @@ export default function OrdenFormulario({
           etiqueta="Cantidad a producir (und)"
           htmlFor="orden-cantidad"
           error={errores.cantidad}
-          ayuda={capacidad !== null ? `Con el stock actual se pueden fabricar ${formatoCantidad(capacidad)} und.` : undefined}
+          ayuda={capacidad !== null ? `Con la materia prima disponible se pueden fabricar ${formatoCantidad(capacidad)} und${comprometida.size ? ' (descontando lo reservado por otras órdenes abiertas)' : ''}.` : undefined}
           requerido
         >
           <input id="orden-cantidad" type="number" min="1" step="1" inputMode="numeric" value={valores.cantidad} onChange={(e) => cambiar('cantidad', e.target.value)} className={claseInput} />
@@ -125,7 +136,7 @@ export default function OrdenFormulario({
         tieneMateriaDefinida(receta) ? (
           <div>
             <p className="text-xs font-medium text-stone-700 mb-2">Materia prima requerida</p>
-            <TablaRequerimientos lineas={requerimientos(receta, cantidadValida ? cantidad : 1, materiasPrimas)} cantidad={cantidadValida ? cantidad : 1} />
+            <TablaRequerimientos lineas={lineas} cantidad={cantidadValida ? cantidad : 1} />
           </div>
         ) : (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -138,7 +149,15 @@ export default function OrdenFormulario({
         )
       )}
 
-      <PieFormulario onCancelar={onCancelar} textoGuardar={orden ? 'Guardar cambios' : 'Crear orden'} enviando={enviando} />
+      {(sinMateria || faltantes.length > 0) && (
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {sinMateria
+            ? 'Se acabó la materia prima para este producto: no se puede crear la orden hasta que se registre una compra.'
+            : `No se puede ${orden ? 'guardar' : 'crear'} la orden: faltan ${faltantes.map((l) => `${formatoCantidad(l.faltante)} ${l.unidad} de ${l.nombre}`).join(', ')}. Reduzca la cantidad a ${formatoCantidad(capacidad ?? 0)} und o compre más materia prima.`}
+        </div>
+      )}
+
+      <PieFormulario onCancelar={onCancelar} textoGuardar={orden ? 'Guardar cambios' : 'Crear orden'} enviando={enviando} deshabilitado={sinMateria || faltantes.length > 0} />
     </form>
   )
 }

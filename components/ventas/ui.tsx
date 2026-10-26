@@ -16,9 +16,13 @@ export function AvisoConexionVentas() {
   return <div role="alert" className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}. Revisa la conexión de Supabase y que hayas aplicado la migración SQL de ventas y compras.</div>
 }
 
-// Insignia para documentos completados/anulados (ventas y compras)
-export function InsigniaDocumento({ anulado, texto }: { anulado: boolean; texto: string }) {
-  const estilo = anulado ? 'bg-stone-100 text-stone-500 ring-stone-500/20' : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+// Insignia para documentos completados/anulados (ventas y compras) y ventas pendientes de producción
+export function InsigniaDocumento({ anulado, texto, pendiente = false }: { anulado: boolean; texto: string; pendiente?: boolean }) {
+  const estilo = anulado
+    ? 'bg-stone-100 text-stone-500 ring-stone-500/20'
+    : pendiente
+      ? 'bg-amber-50 text-amber-700 ring-amber-600/20'
+      : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'
   return (
     <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset whitespace-nowrap ${estilo}`}>
       <span className="w-1.5 h-1.5 rounded-full bg-current" />

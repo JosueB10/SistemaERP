@@ -3,7 +3,9 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import { supabase } from '../supabase'
 import { cargarInventario } from '../inventario/store'
+import { cargarProduccion } from '../produccion/store'
 import type { ResultadoAccion } from '../inventario/tipos'
+import { fechaHoy } from '../inventario/utilidades'
 import type { Cliente, ClienteEntrada, DatosVentas, LineaVenta, MetodoPago, Venta, VentaEntrada } from './tipos'
 import { codigoCliente, codigoVenta, ETIQUETAS_METODO_PAGO } from './utilidades'
 
@@ -53,7 +55,8 @@ const mapLinea = (r: Fila): LineaVenta => ({
   precioUnitario: numero(r.precio_unitario),
   subtotal: numero(r.subtotal),
   costoUnitario: numero(r.costo_unitario),
-  fabricadas: numero(r.fabricadas)
+  fabricadas: numero(r.fabricadas),
+  porProducir: numero(r.por_producir)
 })
 
 const METODOS = Object.keys(ETIQUETAS_METODO_PAGO) as MetodoPago[]
@@ -70,8 +73,9 @@ const mapVenta = (r: Fila): Venta => ({
   impuesto: numero(r.impuesto),
   total: numero(r.total),
   costoTotal: numero(r.costo_total),
-  estado: r.estado === 'anulada' ? 'anulada' : 'completada',
+  estado: r.estado === 'anulada' ? 'anulada' : r.estado === 'pendiente' ? 'pendiente' : 'completada',
   observaciones: opcional(r.observaciones),
+  completadaEn: opcional(r.completada_en),
   anuladaEn: opcional(r.anulada_en),
   motivoAnulacion: opcional(r.motivo_anulacion),
   lineas: ((r.venta_detalle as Fila[] | null) ?? []).map(mapLinea)
@@ -107,7 +111,8 @@ export async function cargarVentas(forzar = false): Promise<void> {
 function resultado(error: { message: string } | null): ResultadoAccion { return error ? { ok: false, error: error.message } : { ok: true } }
 async function recargar(conInventario = false): Promise<ResultadoAccion> {
   try {
-    await Promise.all([cargarVentas(true), conInventario ? cargarInventario(true) : Promise.resolve()])
+    // Las ventas pendientes crean y cancelan órdenes de producción
+    await Promise.all([cargarVentas(true), conInventario ? cargarInventario(true) : Promise.resolve(), conInventario ? cargarProduccion(true) : Promise.resolve()])
     return { ok: true }
   } catch (err) { return { ok: false, error: (err as Error).message } }
 }
@@ -149,8 +154,9 @@ export async function cambiarEstadoCliente(id: string, activo: boolean): Promise
 
 // ---------- Ventas ----------
 
-// Descuenta el stock (fabricando lo faltante), guarda la venta y su ingreso en una sola transacción
-export async function registrarVenta(e: VentaEntrada): Promise<ResultadoAccion & { id?: string }> {
+// Si hay stock terminado para todo, lo descuenta y registra el ingreso. Si no, la venta queda pendiente
+// (sin mover inventario ni dinero) y se crea una orden de producción por lo que falta.
+export async function registrarVenta(e: VentaEntrada): Promise<ResultadoAccion & { id?: string; pendiente?: boolean }> {
   const sesion = await validarSesion()
   if (!sesion.ok) return sesion
   if (e.lineas.length === 0) return { ok: false, error: 'Agregue al menos un producto a la venta.' }
@@ -166,7 +172,18 @@ export async function registrarVenta(e: VentaEntrada): Promise<ResultadoAccion &
   })
   if (save.error) return resultado(save.error)
   const recarga = await recargar(true)
-  return recarga.ok ? { ok: true, id: String(save.data) } : recarga
+  const id = String(save.data)
+  return recarga.ok ? { ok: true, id, pendiente: estado.ventas.find((v) => v.id === id)?.estado === 'pendiente' } : recarga
+}
+
+// Venta pendiente cuyo producto ya se fabricó: descuenta el stock y registra el ingreso
+export async function completarVenta(id: string): Promise<ResultadoAccion> {
+  const sesion = await validarSesion()
+  if (!sesion.ok) return sesion
+  // La fecha la pone el navegador: la base está en UTC y de noche ya sería el día siguiente
+  const save = await supabase.rpc('completar_venta', { p_venta_id: Number(id), p_fecha: fechaHoy() })
+  if (save.error) return resultado(save.error)
+  return recargar(true)
 }
 
 export async function anularVenta(id: string, motivo: string): Promise<ResultadoAccion> {

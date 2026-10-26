@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { CheckCircle2, Pencil, Play, XCircle } from 'lucide-react'
 
 import { useInventario } from '@/lib/inventario/store'
 import { ABREVIATURAS_UNIDAD, formatoCantidad, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
 import { cancelarOrden, iniciarOrden, useProduccion } from '@/lib/produccion/store'
 import type { OrdenProduccion } from '@/lib/produccion/tipos'
-import { costoUnitarioOrden, ordenAbierta, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
+import { codigoVenta } from '@/lib/ventas/utilidades'
+import { costoUnitarioOrden, materiaComprometida, ordenAbierta, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
 import { claseBotonPrimario, claseBotonSecundario, claseCabeceraTabla, claseCeldaTabla, claseInput, ErrorFormulario } from '../inventario/ui'
 import { DatoDetalle } from '../recursos-humanos/ui'
 import { InsigniaOrden, TablaRequerimientos } from './ui'
@@ -24,7 +26,7 @@ export default function OrdenDetalle({
   onAccion: (mensaje: string) => void
 }) {
   const { productos, materiasPrimas } = useInventario()
-  const { recetas, responsables } = useProduccion()
+  const { recetas, ordenes, responsables } = useProduccion()
   const [error, setError] = useState<string | null>(null)
   const [cancelando, setCancelando] = useState(false)
   const [motivo, setMotivo] = useState('')
@@ -34,6 +36,10 @@ export default function OrdenDetalle({
   const responsable = responsables.find((r) => r.id === orden.empleadoId)
   const receta = recetaDeProducto(recetas, orden.productoId)
   const porId = new Map(materiasPrimas.map((m) => [m.id, m]))
+  const lineas = tieneMateriaDefinida(receta)
+    ? requerimientos(receta, orden.cantidadPlanificada, materiasPrimas, materiaComprometida(ordenes, recetas, orden.id))
+    : []
+  const faltaMateria = lineas.some((l) => l.faltante > 0)
 
   const ejecutar = async (accion: () => Promise<{ ok: boolean; error?: string }>, mensaje: string) => {
     setOcupado(true)
@@ -52,13 +58,20 @@ export default function OrdenDetalle({
           <p className="font-mono text-xs text-stone-400">{orden.codigo}</p>
           <p className="text-lg font-semibold text-stone-900">{producto?.nombre ?? 'Producto inactivo'}</p>
           <div className="mt-1"><InsigniaOrden estado={orden.estado} /></div>
+          {orden.ventaId && (
+            <p className="mt-2 text-xs text-stone-500">
+              Para la venta{' '}
+              <Link href={`/ventas?detalle=${encodeURIComponent(orden.ventaId)}`} className="font-mono font-medium text-stone-700 underline">{codigoVenta(orden.ventaId)}</Link>
+              {orden.estado !== 'completada' && orden.estado !== 'cancelada' && ': al completar esta orden la venta se completará sola.'}
+            </p>
+          )}
         </div>
         {ordenAbierta(orden) && !cancelando && (
           <div className="flex flex-wrap gap-2">
             {orden.estado === 'pendiente' && (
               <>
                 <button type="button" onClick={onEditar} className={claseBotonSecundario}><Pencil size={15} />Editar</button>
-                <button type="button" disabled={ocupado} onClick={() => ejecutar(() => iniciarOrden(orden.id), 'Orden en proceso')} className={claseBotonSecundario}><Play size={15} />Iniciar</button>
+                <button type="button" disabled={ocupado || faltaMateria} title={faltaMateria ? 'No hay materia prima suficiente' : undefined} onClick={() => ejecutar(() => iniciarOrden(orden.id), 'Orden en proceso')} className={claseBotonSecundario}><Play size={15} />Iniciar</button>
               </>
             )}
             <button type="button" onClick={() => setCancelando(true)} className={claseBotonSecundario}><XCircle size={15} />Cancelar</button>
@@ -145,7 +158,7 @@ export default function OrdenDetalle({
         <div>
           <h3 className="text-sm font-semibold text-stone-900 mb-2">Materia prima requerida</h3>
           {tieneMateriaDefinida(receta) ? (
-            <TablaRequerimientos lineas={requerimientos(receta, orden.cantidadPlanificada, materiasPrimas)} cantidad={orden.cantidadPlanificada} />
+            <TablaRequerimientos lineas={lineas} cantidad={orden.cantidadPlanificada} />
           ) : (
             <p className="text-sm text-amber-700">El producto no tiene receta definida.</p>
           )}

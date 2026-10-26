@@ -1,11 +1,12 @@
 import type { MateriaPrima, Producto } from '../inventario/tipos'
-import type { Receta } from '../produccion/tipos'
-import { recetaDeProducto, redondear3, requerimientos, tieneMateriaDefinida } from '../produccion/utilidades'
+import type { OrdenProduccion, Receta } from '../produccion/tipos'
+import { materiaComprometida, recetaDeProducto, redondear3, requerimientos, tieneMateriaDefinida } from '../produccion/utilidades'
 import type { EstadoVenta, MetodoPago, Venta } from './tipos'
 
 // ---------- Etiquetas ----------
 
 export const ETIQUETAS_ESTADO_VENTA: Record<EstadoVenta, string> = {
+  pendiente: 'Pendiente',
   completada: 'Completada',
   anulada: 'Anulada'
 }
@@ -48,13 +49,17 @@ export function unidadesVenta(venta: Venta) {
 }
 
 // ---------- Disponibilidad al vender ----------
-// Lo que no haya en stock terminado se fabrica al momento con la receta (vender_producto).
+// Solo se vende lo que ya está hecho. Si el stock terminado (menos lo apartado por otras ventas pendientes)
+// no alcanza, la venta queda pendiente y se crea una orden de producción por lo que falta.
 
 export interface AnalisisLinea {
   productoId: string
   cantidad: number
+  disponible: number
   desdeStock: number
-  fabricadas: number
+  porProducir: number
+  // Unidades del stock apartadas por otras ventas pendientes
+  apartadas: number
   sinReceta: boolean
 }
 
@@ -67,23 +72,39 @@ export interface FaltanteMateria {
   faltante: number
 }
 
+// Unidades de cada producto apartadas por ventas pendientes
+export function unidadesApartadas(ventas: Venta[], excluirVentaId?: string) {
+  const apartadas = new Map<string, number>()
+  for (const venta of ventas) {
+    if (venta.estado !== 'pendiente' || venta.id === excluirVentaId) continue
+    for (const linea of venta.lineas) apartadas.set(linea.productoId, (apartadas.get(linea.productoId) ?? 0) + linea.cantidad)
+  }
+  return apartadas
+}
+
 export function analizarVenta(
   lineas: { productoId: string; cantidad: number }[],
   productos: Producto[],
   recetas: Receta[],
-  materiasPrimas: MateriaPrima[]
+  materiasPrimas: MateriaPrima[],
+  ventas: Venta[],
+  ordenes: OrdenProduccion[]
 ) {
   const productoPorId = new Map(productos.map((p) => [p.id, p]))
+  const apartadasPorProducto = unidadesApartadas(ventas)
+  const comprometida = materiaComprometida(ordenes, recetas)
   const consumo = new Map<string, FaltanteMateria>()
 
   const analisis: AnalisisLinea[] = lineas.map((linea) => {
     const existencias = Math.max(0, productoPorId.get(linea.productoId)?.existencias ?? 0)
-    const desdeStock = Math.min(existencias, linea.cantidad)
-    const fabricadas = linea.cantidad - desdeStock
+    const apartadas = apartadasPorProducto.get(linea.productoId) ?? 0
+    const disponible = Math.max(0, existencias - apartadas)
+    const desdeStock = Math.min(disponible, linea.cantidad)
+    const porProducir = linea.cantidad - desdeStock
     const receta = recetaDeProducto(recetas, linea.productoId)
-    if (fabricadas > 0 && tieneMateriaDefinida(receta)) {
+    if (porProducir > 0 && tieneMateriaDefinida(receta)) {
       // Varias líneas pueden usar la misma materia prima, así que se acumula el requerimiento
-      requerimientos(receta, fabricadas, materiasPrimas).forEach((req) => {
+      requerimientos(receta, porProducir, materiasPrimas, comprometida).forEach((req) => {
         const actual = consumo.get(req.materiaPrimaId)
         consumo.set(req.materiaPrimaId, {
           materiaPrimaId: req.materiaPrimaId,
@@ -95,14 +116,16 @@ export function analizarVenta(
         })
       })
     }
-    return { productoId: linea.productoId, cantidad: linea.cantidad, desdeStock, fabricadas, sinReceta: fabricadas > 0 && !tieneMateriaDefinida(receta) }
+    return { productoId: linea.productoId, cantidad: linea.cantidad, disponible, desdeStock, porProducir, apartadas, sinReceta: porProducir > 0 && !tieneMateriaDefinida(receta) }
   })
 
   const materia = Array.from(consumo.values()).map((m) => ({ ...m, faltante: Math.max(0, redondear3(m.requerido - m.disponible)) }))
   return {
     lineas: analisis,
     materia,
-    bloqueos: analisis.filter((l) => l.sinReceta).length + materia.filter((m) => m.faltante > 0).length
+    pendiente: analisis.some((l) => l.porProducir > 0),
+    // Si falta materia prima la orden no se crea sola: hay que comprar y luego producir
+    sinMateria: materia.some((m) => m.faltante > 0)
   }
 }
 

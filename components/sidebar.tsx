@@ -11,13 +11,16 @@ import {
   Wallet,
   Users,
   FileText,
-  Settings,
+  Bell,
+  UserRound,
   LogOut,
   ChevronDown,
   ChevronRight
 } from 'lucide-react'
 
 import { useState } from 'react'
+
+import { cerrarSesion, useUsuario } from '@/lib/cuenta/sesion'
 
 type MenuItem = {
   label: string
@@ -169,14 +172,28 @@ const menuItems: MenuItem[] = [
   },
 
   {
-    label: 'Configuración',
-    href: '/configuracion',
-    icon: Settings
+    label: 'Notificaciones',
+    href: '/notificaciones',
+    icon: Bell
+  },
+
+  {
+    label: 'Mi cuenta',
+    href: '/cuenta',
+    icon: UserRound
   }
 ]
 
+// Todas las páginas del menú, para el buscador del encabezado
+export const PAGINAS: { label: string; seccion: string; href: string }[] = menuItems.flatMap((item) =>
+  item.children
+    ? item.children.map((child) => ({ label: child.label, seccion: item.label, href: child.href }))
+    : [{ label: item.label, seccion: 'General', href: item.href ?? '/dashboard' }]
+)
+
 export default function Sidebar() {
   const pathname = usePathname()
+  const usuario = useUsuario()
 
   const [openMenus, setOpenMenus] = useState<string[]>([
     'Ventas',
@@ -324,25 +341,25 @@ export default function Sidebar() {
 
           <div className="w-9 h-9 rounded-full bg-stone-700 flex items-center justify-center">
             <span className="text-sm font-semibold">
-              A
+              {usuario?.iniciales ?? '…'}
             </span>
           </div>
 
-          <div className="flex-1 min-w-0">
+          <Link href="/cuenta" className="flex-1 min-w-0 hover:opacity-80">
 
             <p className="text-sm font-medium truncate">
-              Administrador
+              {usuario?.nombre ?? 'Cargando…'}
             </p>
 
-            <p className="text-xs text-stone-500">
-              Administrador
+            <p className="text-xs text-stone-500 truncate">
+              {usuario?.correo ?? ''}
             </p>
 
-          </div>
+          </Link>
 
         </div>
 
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:bg-white/5 hover:text-white transition">
+        <button type="button" onClick={cerrarSesion} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-stone-400 hover:bg-white/5 hover:text-white transition">
           <LogOut size={18} />
           Cerrar sesión
         </button>

@@ -1,6 +1,7 @@
 // Tipos compartidos del módulo de ventas.
 
-export type EstadoVenta = 'completada' | 'anulada'
+// pendiente: falta producir parte de lo vendido; aún no movió inventario ni dinero
+export type EstadoVenta = 'pendiente' | 'completada' | 'anulada'
 
 export type MetodoPago = 'efectivo' | 'tarjeta' | 'transferencia' | 'credito'
 
@@ -24,6 +25,8 @@ export interface LineaVenta {
   subtotal: number
   costoUnitario: number
   fabricadas: number
+  // Unidades que no había en stock al registrar la venta (ventas pendientes)
+  porProducir: number
 }
 
 export interface Venta {
@@ -40,6 +43,7 @@ export interface Venta {
   costoTotal: number
   estado: EstadoVenta
   observaciones?: string
+  completadaEn?: string
   anuladaEn?: string
   motivoAnulacion?: string
   lineas: LineaVenta[]

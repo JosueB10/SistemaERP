@@ -292,18 +292,20 @@ export function ErrorFormulario({ mensaje }: { mensaje: string | null }) {
 export function PieFormulario({
   onCancelar,
   textoGuardar,
-  enviando = false
+  enviando = false,
+  deshabilitado = false
 }: {
   onCancelar: () => void
   textoGuardar: string
   enviando?: boolean
+  deshabilitado?: boolean
 }) {
   return (
     <div className="flex flex-col-reverse gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:justify-end">
       <button type="button" onClick={onCancelar} className={claseBotonSecundario}>
         Cancelar
       </button>
-      <button type="submit" disabled={enviando} className={claseBotonPrimario}>
+      <button type="submit" disabled={enviando || deshabilitado} className={claseBotonPrimario}>
         {enviando ? 'Guardando...' : textoGuardar}
       </button>
     </div>

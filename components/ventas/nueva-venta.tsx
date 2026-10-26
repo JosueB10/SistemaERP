@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { AlertTriangle, CheckCircle2, Plus, Trash2, UserPlus } from 'lucide-react'
+import { CheckCircle2, Clock, Plus, Trash2, UserPlus } from 'lucide-react'
 
 import { useInventario } from '@/lib/inventario/store'
 import { fechaHoy, formatoCantidad, formatoCordobas, validarNumero } from '@/lib/inventario/utilidades'
@@ -33,8 +33,8 @@ const nuevaLinea = (): Linea => ({ clave: siguienteClave++, productoId: '', cant
 
 export default function NuevaVenta() {
   const { productos, materiasPrimas } = useInventario()
-  const { recetas } = useProduccion()
-  const { clientes } = useVentas()
+  const { recetas, ordenes } = useProduccion()
+  const { clientes, ventas } = useVentas()
   const searchParams = useSearchParams()
 
   const [clienteId, setClienteId] = useState(searchParams.get('cliente') ?? '')
@@ -47,7 +47,7 @@ export default function NuevaVenta() {
   const [errores, setErrores] = useState<Record<number, string>>({})
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
-  const [registrada, setRegistrada] = useState<{ id: string; total: number } | null>(null)
+  const [registrada, setRegistrada] = useState<{ id: string; total: number; pendiente: boolean } | null>(null)
   const [nuevoCliente, setNuevoCliente] = useState(false)
 
   const productoPorId = new Map(productos.map((p) => [p.id, p]))
@@ -63,9 +63,9 @@ export default function NuevaVenta() {
   const subtotal = validas.reduce((total, l) => total + redondear2(l.cantidad * l.precioUnitario), 0)
   const descuento = Number(descuentoTexto) > 0 ? redondear2(Number(descuentoTexto)) : 0
   const totales = calcularTotales(subtotal, descuento, aplicaIva)
-  const analisis = analizarVenta(validas, productos, recetas, materiasPrimas)
+  const analisis = analizarVenta(validas, productos, recetas, materiasPrimas, ventas, ordenes)
   const analisisPorProducto = new Map(analisis.lineas.map((a) => [a.productoId, a]))
-  const totalFabricadas = analisis.lineas.reduce((total, a) => total + a.fabricadas, 0)
+  const totalPorProducir = analisis.lineas.reduce((total, a) => total + a.porProducir, 0)
   const costoEstimado = validas.reduce((total, l) => total + l.cantidad * (productoPorId.get(l.productoId)?.costoProduccion ?? 0), 0)
 
   const cambiarLinea = (clave: number, campo: 'productoId' | 'cantidad' | 'precio', valor: string) => {
@@ -122,7 +122,6 @@ export default function NuevaVenta() {
       descuentoValido = resultado.valor!
     }
     if (descuentoValido > subtotal) { setErrorGeneral('El descuento no puede ser mayor que el subtotal.'); return }
-    if (analisis.bloqueos > 0) { setErrorGeneral('No hay stock ni materia prima suficiente para algunos productos. Revise los avisos.'); return }
 
     setEnviando(true)
     const resultado = await registrarVenta({
@@ -136,7 +135,7 @@ export default function NuevaVenta() {
     })
     setEnviando(false)
     if (!resultado.ok) { setErrorGeneral(resultado.error); return }
-    setRegistrada({ id: resultado.id ?? '', total: totales.total })
+    setRegistrada({ id: resultado.id ?? '', total: totales.total, pendiente: Boolean(resultado.pendiente) })
   }
 
   if (registrada) {
@@ -144,11 +143,26 @@ export default function NuevaVenta() {
       <>
         <EncabezadoPagina titulo="Nueva venta" descripcion="Registre la venta de productos terminados." seccion={SECCION_VENTAS} />
         <div className={`${claseTarjeta} p-8 text-center max-w-lg mx-auto`}>
-          <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <CheckCircle2 size={24} className="text-emerald-600" />
-          </div>
-          <p className="text-lg font-semibold text-stone-900">Venta {codigoVenta(registrada.id)} registrada</p>
-          <p className="text-sm text-stone-500 mt-1">Total cobrado: {formatoCordobas(registrada.total)}. El inventario y el ingreso ya se actualizaron.</p>
+          {registrada.pendiente ? (
+            <>
+              <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Clock size={24} className="text-amber-600" />
+              </div>
+              <p className="text-lg font-semibold text-stone-900">Venta {codigoVenta(registrada.id)} pendiente de producción</p>
+              <p className="text-sm text-stone-500 mt-1">
+                Total por cobrar: {formatoCordobas(registrada.total)}. Aún no se descontó inventario ni se registró el ingreso:
+                se completará cuando se fabriquen las unidades que faltan. Se envió una notificación para producirlas.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <CheckCircle2 size={24} className="text-emerald-600" />
+              </div>
+              <p className="text-lg font-semibold text-stone-900">Venta {codigoVenta(registrada.id)} registrada</p>
+              <p className="text-sm text-stone-500 mt-1">Total cobrado: {formatoCordobas(registrada.total)}. El inventario y el ingreso ya se actualizaron.</p>
+            </>
+          )}
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Link href={`/ventas?detalle=${encodeURIComponent(registrada.id)}`} className={claseBotonSecundario}>Ver venta</Link>
             <button type="button" onClick={reiniciar} className={claseBotonPrimario}><Plus size={16} />Nueva venta</button>
@@ -164,7 +178,7 @@ export default function NuevaVenta() {
       <AvisoConexionVentas />
       <EncabezadoPagina
         titulo="Nueva venta"
-        descripcion="Lo que no haya en stock terminado se fabrica al momento descontando la materia prima de su receta."
+        descripcion="Solo se entrega lo que ya está fabricado. Si falta producto, la venta queda pendiente hasta que se produzca."
         seccion={SECCION_VENTAS}
       />
 
@@ -238,14 +252,13 @@ export default function NuevaVenta() {
                             </select>
                             {errores[linea.clave] ? (
                               <p className="text-xs text-red-600 mt-1">{errores[linea.clave]}</p>
-                            ) : info?.sinReceta ? (
-                              <p className="flex items-center gap-1 text-xs text-red-600 mt-1">
-                                <AlertTriangle size={12} />
-                                Solo hay {formatoCantidad(info.desdeStock)} en stock y no tiene receta para fabricar el resto.
-                              </p>
-                            ) : info && info.fabricadas > 0 ? (
-                              <p className="text-xs text-amber-700 mt-1">
-                                {formatoCantidad(info.desdeStock)} del stock · {formatoCantidad(info.fabricadas)} se fabricarán con materia prima
+                            ) : info && info.porProducir > 0 ? (
+                              <p className="flex items-start gap-1 text-xs text-amber-700 mt-1">
+                                <Clock size={12} className="mt-0.5 shrink-0" />
+                                <span>
+                                  Hay {formatoCantidad(info.disponible)} disponible(s){info.apartadas ? ` (${formatoCantidad(info.apartadas)} apartada(s) por ventas pendientes)` : ''}:
+                                  faltan {formatoCantidad(info.porProducir)} por producir{info.sinReceta ? ' (sin receta: indique la materia prima al completar la orden)' : ''}.
+                                </span>
                               </p>
                             ) : producto ? (
                               <p className="text-xs text-stone-400 mt-1">Costo {formatoCordobas(producto.costoProduccion)} · lista {formatoCordobas(producto.precioVenta)}</p>
@@ -279,10 +292,22 @@ export default function NuevaVenta() {
             )}
           </section>
 
+          {analisis.pendiente && (
+            <div role="status" className={`rounded-lg border px-4 py-3 text-sm ${analisis.sinMateria ? 'border-red-200 bg-red-50 text-red-700' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+              <p className="font-medium">La venta quedará pendiente: faltan {formatoCantidad(totalPorProducir)} und por producir.</p>
+              <p className="mt-1">
+                No se descontará inventario ni se registrará el ingreso hasta que se fabriquen.{' '}
+                {analisis.sinMateria
+                  ? 'Tampoco alcanza la materia prima: se enviará una notificación para comprarla y producir lo que falta.'
+                  : 'Se creará la orden de producción y, al completarla, la venta se completará sola.'}
+              </p>
+            </div>
+          )}
+
           {analisis.materia.length > 0 && (
             <section className={`${claseTarjeta} p-5`}>
-              <h2 className="text-sm font-semibold text-stone-900">Materia prima a consumir</h2>
-              <p className="text-xs text-stone-500 mb-3">Para fabricar {formatoCantidad(totalFabricadas)} und que no hay en stock.</p>
+              <h2 className="text-sm font-semibold text-stone-900">Materia prima para producir lo que falta</h2>
+              <p className="text-xs text-stone-500 mb-3">Para fabricar {formatoCantidad(totalPorProducir)} und. No se descuenta ahora: se consume al completar la orden de producción.</p>
               <ul className="divide-y divide-stone-100 text-sm">
                 {analisis.materia.map((m) => (
                   <li key={m.materiaPrimaId} className="flex justify-between gap-3 py-2">
@@ -329,7 +354,7 @@ export default function NuevaVenta() {
           <ErrorFormulario mensaje={errorGeneral} />
 
           <button type="submit" disabled={enviando || validas.length === 0} className={`${claseBotonPrimario} w-full`}>
-            {enviando ? 'Registrando...' : 'Registrar venta'}
+            {enviando ? 'Registrando...' : analisis.pendiente ? 'Registrar venta pendiente' : 'Registrar venta'}
           </button>
         </aside>
       </form>

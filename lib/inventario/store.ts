@@ -67,7 +67,7 @@ export async function cargarInventario(forzar = false): Promise<void> {
     const tipo = texto(r.tipo, 'entrada') as Movimiento['tipo']
     const cantidad = numero(r.cantidad)
     const anterior = numero(r.stock_anterior)
-    return [{ id: String(r.id), fecha: texto(r.fecha, texto(r.created_at).slice(0, 10)), registradoEn: texto(r.created_at), claseArticulo, articuloId, tipo, sentido: r.sentido === 'decremento' ? 'decremento' : r.sentido === 'incremento' ? 'incremento' : undefined, cantidad, existenciasAnteriores: anterior, existenciasResultantes: numero(r.stock_resultante ?? (anterior + variacionMovimiento({ tipo, sentido: r.sentido as Movimiento['sentido'], cantidad }))), motivo: texto(r.motivo, texto(r.referencia_tipo, tipo)), observaciones: texto(r.observaciones) || undefined }]
+    return [{ id: String(r.id), fecha: texto(r.fecha, texto(r.created_at).slice(0, 10)), registradoEn: texto(r.created_at), claseArticulo, articuloId, tipo, sentido: r.sentido === 'decremento' ? 'decremento' : r.sentido === 'incremento' ? 'incremento' : undefined, cantidad, existenciasAnteriores: anterior, existenciasResultantes: numero(r.stock_resultante ?? (anterior + variacionMovimiento({ tipo, sentido: r.sentido as Movimiento['sentido'], cantidad }))), motivo: texto(r.motivo, texto(r.referencia_tipo, tipo)), observaciones: texto(r.observaciones) || undefined, referenciaTipo: r.referencia_id != null ? texto(r.referencia_tipo) || undefined : undefined, referenciaId: r.referencia_id != null ? String(r.referencia_id) : undefined }]
   })
   estado = { productos, materiasPrimas, movimientos }
   errorConexion = null

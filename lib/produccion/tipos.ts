@@ -32,6 +32,8 @@ export interface OrdenProduccion {
   productoId: string
   recetaId?: string
   empleadoId?: string
+  // Venta pendiente que esta orden surte
+  ventaId?: string
   fechaProgramada?: string
   fechaInicio?: string
   fechaFin?: string
@@ -69,6 +71,7 @@ export interface OrdenEntrada {
   cantidadPlanificada: number
   fechaProgramada: string
   empleadoId?: string
+  ventaId?: string
   observaciones: string
 }
 

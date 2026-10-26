@@ -9,6 +9,7 @@ import { AvisoConexion, Campo, claseBotonSecundario, claseInput, claseTarjeta, E
 import { AvisoConexionVentas } from '../ventas/ui'
 import { formatoFecha, fechaHoy } from '@/lib/inventario/utilidades'
 import { ETIQUETAS_PRESET, periodoDePreset, type Periodo, type PresetPeriodo } from '@/lib/reportes/calculos'
+import ReporteActividad from './reporte-actividad'
 import ReporteCompras from './reporte-compras'
 import ReporteFlujo from './reporte-flujo'
 import ReporteInventario from './reporte-inventario'
@@ -16,9 +17,10 @@ import ReporteProduccion from './reporte-produccion'
 import ReporteResultados from './reporte-resultados'
 import ReporteVentas from './reporte-ventas'
 
-type TipoReporte = 'resultados' | 'ventas' | 'compras' | 'flujo' | 'produccion' | 'inventario'
+type TipoReporte = 'actividad' | 'resultados' | 'ventas' | 'compras' | 'flujo' | 'produccion' | 'inventario'
 
 const REPORTES: Record<TipoReporte, { titulo: string; descripcion: string; archivo: string }> = {
+  actividad: { titulo: 'Actividad', descripcion: 'Recopilación de lo hecho: compras, ventas, producción y material utilizado, con su documento de origen.', archivo: 'actividad' },
   resultados: { titulo: 'Estado de resultados', descripcion: 'Ventas, costo de ventas, gastos y utilidad del período.', archivo: 'estado-resultados' },
   ventas: { titulo: 'Ventas', descripcion: 'Qué se vendió, a quién y cómo se cobró.', archivo: 'reporte-ventas' },
   compras: { titulo: 'Compras', descripcion: 'Qué se compró y a qué proveedores.', archivo: 'reporte-compras' },
@@ -35,7 +37,7 @@ function textoPeriodo({ desde, hasta }: Periodo) {
 }
 
 export default function ReportesVista() {
-  const [reporte, setReporte] = useState<TipoReporte>('resultados')
+  const [reporte, setReporte] = useState<TipoReporte>('actividad')
   const [preset, setPreset] = useState<PresetPeriodo>('este_mes')
   const [personalizado, setPersonalizado] = useState<Periodo>(() => periodoDePreset('este_mes'))
 
@@ -141,6 +143,7 @@ export default function ReportesVista() {
         </div>
       ) : (
         <>
+          {reporte === 'actividad' && <ReporteActividad periodo={periodo} archivo={archivo} />}
           {reporte === 'resultados' && <ReporteResultados periodo={periodo} archivo={archivo} />}
           {reporte === 'ventas' && <ReporteVentas periodo={periodo} archivo={archivo} />}
           {reporte === 'compras' && <ReporteCompras periodo={periodo} archivo={archivo} />}

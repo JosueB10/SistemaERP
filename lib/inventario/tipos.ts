@@ -58,6 +58,9 @@ export interface Movimiento {
   existenciasResultantes: number
   motivo: string
   observaciones?: string
+  // Documento que generó el movimiento (venta, compra u orden de producción)
+  referenciaTipo?: string
+  referenciaId?: string
 }
 
 export interface DatosInventario {
@@ -72,7 +75,7 @@ export type MateriaPrimaEntrada = Omit<MateriaPrima, 'id' | 'actualizadoEn'>
 
 export type MovimientoEntrada = Omit<
   Movimiento,
-  'id' | 'registradoEn' | 'existenciasAnteriores' | 'existenciasResultantes'
+  'id' | 'registradoEn' | 'existenciasAnteriores' | 'existenciasResultantes' | 'referenciaTipo' | 'referenciaId'
 >
 
 export type ResultadoAccion = { ok: true } | { ok: false; error: string }

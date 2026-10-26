@@ -1,28 +1,11 @@
 import type { Metadata } from 'next'
 
-import Header from '@/components/header'
-import Sidebar from '@/components/sidebar'
+import MarcoApp from '@/components/marco-app'
 
 export const metadata: Metadata = {
   title: 'Reportes | NeumoPad ERP'
 }
 
 export default function ReportesLayout({ children }: LayoutProps<'/reportes'>) {
-  return (
-    <div className="min-h-screen bg-[#f5f3f0] flex print:bg-white">
-
-      <Sidebar />
-
-      <div className="flex-1 min-w-0">
-
-        <Header />
-
-        <main className="p-4 sm:p-6 lg:p-8 print:p-0">
-          {children}
-        </main>
-
-      </div>
-
-    </div>
-  )
+  return <MarcoApp claseMain="print:p-0">{children}</MarcoApp>
 }

@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import { supabase } from '../supabase'
 import { cargarInventario } from '../inventario/store'
+import { cargarVentas } from '../ventas/store'
 import type { ResultadoAccion } from '../inventario/tipos'
 import { fechaHoy } from '../inventario/utilidades'
 import type {
@@ -72,6 +73,7 @@ const mapOrden = (r: Fila): OrdenProduccion => ({
   productoId: String(r.producto_id),
   recetaId: idOpcional(r.receta_id),
   empleadoId: idOpcional(r.empleado_id),
+  ventaId: idOpcional(r.venta_id),
   fechaProgramada: texto(r.fecha_programada) || undefined,
   fechaInicio: texto(r.fecha_inicio) || undefined,
   fechaFin: texto(r.fecha_fin) || undefined,
@@ -169,7 +171,8 @@ export async function guardarOrden(e: OrdenEntrada, id?: string): Promise<Result
     cantidad_planificada: e.cantidadPlanificada,
     fecha_programada: e.fechaProgramada || null,
     observaciones: e.observaciones.trim() || null,
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    ...(e.ventaId ? { venta_id: Number(e.ventaId) } : {})
   }
   const save = id
     ? await supabase.from('ordenes_produccion').update(payload).eq('id', id).eq('estado', 'pendiente')
@@ -223,5 +226,8 @@ export async function completarOrden(id: string, e: CompletarOrdenEntrada): Prom
     p_observaciones: e.observaciones.trim() || null
   })
   if (save.error) return resultado(save.error)
-  return recargar(true)
+  // Completar la orden puede completar ventas pendientes (trigger en la base)
+  const recarga = await recargar(true)
+  await cargarVentas(true).catch(() => undefined)
+  return recarga
 }

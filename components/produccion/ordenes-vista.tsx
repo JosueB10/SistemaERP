@@ -1,13 +1,15 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { AlertTriangle, CheckCircle2, Clock, Eye, Factory, Plus, Wallet } from 'lucide-react'
 
 import { useInventario } from '@/lib/inventario/store'
 import { coincideBusqueda, fechaHoy, formatoCantidad, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
 import { useProduccion } from '@/lib/produccion/store'
+import { codigoVenta } from '@/lib/ventas/utilidades'
 import type { EstadoOrden, OrdenProduccion } from '@/lib/produccion/tipos'
-import { ETIQUETAS_ESTADO_ORDEN, ordenAbierta, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
+import { ETIQUETAS_ESTADO_ORDEN, materiaComprometida, ordenAbierta, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
 import {
   AvisoConexion,
   Buscador,
@@ -23,6 +25,7 @@ import {
   Notificacion,
   Paginacion,
   TarjetaIndicador,
+  useDetalleEnUrl,
   useNotificacion,
   usePaginacion
 } from '../inventario/ui'
@@ -46,7 +49,29 @@ export default function OrdenesVista() {
 
   const [busqueda, setBusqueda] = useState('')
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>('abiertas')
-  const [modal, setModal] = useState<ModalActivo>(null)
+  const [modalLocal, setModal] = useState<ModalActivo>(null)
+  // ?detalle=<id> abre la orden directamente (enlaces desde notificaciones y reportes)
+  const { detalleId, cerrarDetalle } = useDetalleEnUrl()
+  // ?nueva=<producto>&cantidad=<n>&venta=<id> abre una orden nueva prellenada (lo que falta para una venta pendiente)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const productoNueva = searchParams.get('nueva')
+  const ventaNueva = searchParams.get('venta') ?? undefined
+  const inicial = productoNueva
+    ? {
+        productoId: productoNueva,
+        cantidad: Math.max(1, Math.trunc(Number(searchParams.get('cantidad')) || 1)),
+        ventaId: ventaNueva,
+        observaciones: ventaNueva ? `Para la venta ${codigoVenta(ventaNueva)}` : ''
+      }
+    : undefined
+  const modal: ModalActivo = modalLocal ?? (detalleId ? { tipo: 'detalle', ordenId: detalleId } : inicial ? { tipo: 'formulario' } : null)
+  const cerrar = () => {
+    setModal(null)
+    if (detalleId) cerrarDetalle()
+    if (productoNueva) router.replace(pathname, { scroll: false })
+  }
 
   const productoPorId = useMemo(() => new Map(productos.map((p) => [p.id, p])), [productos])
   const responsablePorId = useMemo(() => new Map(responsables.map((r) => [r.id, r])), [responsables])
@@ -69,18 +94,18 @@ export default function OrdenesVista() {
   const pendientes = ordenes.filter((o) => o.estado === 'pendiente').length
   const enProceso = ordenes.filter((o) => o.estado === 'en_proceso').length
 
-  // Órdenes abiertas a las que no les alcanza la materia prima actual
+  // Órdenes abiertas a las que no les alcanza la materia prima (descontando lo que reservan las demás)
   const sinMateria = (orden: OrdenProduccion) => {
     const receta = recetaDeProducto(recetas, orden.productoId)
     if (!tieneMateriaDefinida(receta)) return null
-    return requerimientos(receta, orden.cantidadPlanificada, materiasPrimas).some((l) => l.faltante > 0)
+    return requerimientos(receta, orden.cantidadPlanificada, materiasPrimas, materiaComprometida(ordenes, recetas, orden.id)).some((l) => l.faltante > 0)
   }
   const bloqueadas = ordenes.filter((o) => ordenAbierta(o) && sinMateria(o)).length
 
   const ordenModal = modal && modal.tipo !== 'formulario' ? ordenes.find((o) => o.id === modal.ordenId) : undefined
 
   const alTerminar = (texto: string) => {
-    setModal(null)
+    cerrar()
     mostrar(texto)
   }
 
@@ -202,15 +227,15 @@ export default function OrdenesVista() {
         abierto={modal?.tipo === 'formulario'}
         titulo={modal?.tipo === 'formulario' && modal.orden ? `Editar orden ${modal.orden.codigo}` : 'Nueva orden de producción'}
         descripcion="Los campos marcados con * son obligatorios."
-        onCerrar={() => setModal(null)}
+        onCerrar={cerrar}
         ancho="max-w-3xl"
       >
         {modal?.tipo === 'formulario' && (
-          <OrdenFormulario key={modal.orden?.id ?? 'nueva'} orden={modal.orden} onCancelar={() => setModal(null)} onGuardado={alTerminar} />
+          <OrdenFormulario key={modal.orden?.id ?? 'nueva'} orden={modal.orden} inicial={modal.orden ? undefined : inicial} onCancelar={cerrar} onGuardado={alTerminar} />
         )}
       </Modal>
 
-      <Modal abierto={modal?.tipo === 'detalle' && Boolean(ordenModal)} titulo="Detalle de la orden" onCerrar={() => setModal(null)} ancho="max-w-3xl">
+      <Modal abierto={modal?.tipo === 'detalle' && Boolean(ordenModal)} titulo="Detalle de la orden" onCerrar={cerrar} ancho="max-w-3xl">
         {modal?.tipo === 'detalle' && ordenModal && (
           <OrdenDetalle
             key={ordenModal.id}
@@ -226,11 +251,11 @@ export default function OrdenesVista() {
         abierto={modal?.tipo === 'completar' && Boolean(ordenModal)}
         titulo={ordenModal ? `Completar orden ${ordenModal.codigo}` : 'Completar orden'}
         descripcion="Se descontará la materia prima y el producto terminado entrará al inventario."
-        onCerrar={() => setModal(null)}
+        onCerrar={cerrar}
         ancho="max-w-3xl"
       >
         {modal?.tipo === 'completar' && ordenModal && (
-          <OrdenCompletar key={ordenModal.id} orden={ordenModal} onCancelar={() => setModal(null)} onGuardado={alTerminar} />
+          <OrdenCompletar key={ordenModal.id} orden={ordenModal} onCancelar={cerrar} onGuardado={alTerminar} />
         )}
       </Modal>
 

@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
+// Solo se vuelve a rutas internas, nunca a otro sitio (?siguiente=//sitio-externo)
+function destinoSeguro() {
+  const siguiente = new URLSearchParams(window.location.search).get('siguiente')
+  return siguiente && siguiente.startsWith('/') && !siguiente.startsWith('//') && !siguiente.startsWith('/login') ? siguiente : '/dashboard'
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
@@ -12,6 +18,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+  const [aviso, setAviso] = useState<string | null>(null)
 
   async function iniciarSesion(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault()
@@ -25,7 +32,26 @@ export default function LoginPage() {
         : `No se pudo iniciar sesión: ${authError.message}`)
       return
     }
-    router.replace('/dashboard')
+    router.replace(destinoSeguro())
+  }
+
+  async function recuperarContrasena() {
+    setError(null)
+    setAviso(null)
+    if (!email.trim()) {
+      setError('Escribe tu correo arriba y vuelve a pulsar «¿Olvidaste tu contraseña?».')
+      return
+    }
+    setEnviando(true)
+    const { error: authError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/login/restablecer`
+    })
+    setEnviando(false)
+    if (authError) {
+      setError(`No se pudo enviar el correo: ${authError.message}`)
+      return
+    }
+    setAviso(`Si ${email.trim()} tiene una cuenta, recibirá un enlace para crear una nueva contraseña.`)
   }
 
   return (
@@ -134,11 +160,15 @@ export default function LoginPage() {
             <div className="text-right">
               <button
                 type="button"
-                className="text-sm text-neutral-600 hover:text-neutral-900"
+                onClick={recuperarContrasena}
+                disabled={enviando}
+                className="text-sm text-neutral-600 hover:text-neutral-900 disabled:opacity-60"
               >
                 ¿Olvidaste tu contraseña?
               </button>
             </div>
+
+            {aviso && <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{aviso}</p>}
 
             {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
