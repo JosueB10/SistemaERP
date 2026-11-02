@@ -9,10 +9,13 @@ import { ABREVIATURAS_UNIDAD, formatoCantidad, formatoCordobas, formatoFecha } f
 import { cancelarOrden, iniciarOrden, useProduccion } from '@/lib/produccion/store'
 import type { OrdenProduccion } from '@/lib/produccion/tipos'
 import { codigoVenta } from '@/lib/ventas/utilidades'
-import { costoUnitarioOrden, materiaComprometida, ordenAbierta, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
-import { claseBotonPrimario, claseBotonSecundario, claseCabeceraTabla, claseCeldaTabla, claseInput, ErrorFormulario } from '../inventario/ui'
+import { costoUnitarioOrden, formatoMinutos, materiaComprometida, ordenAbierta, recetaDeProducto, requerimientos, rutaPendiente, tiempoEstimadoRuta, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
+import { useCalidad } from '@/lib/calidad/store'
+import { ETIQUETAS_ESTADO_LOTE } from '@/lib/calidad/utilidades'
+import { claseBotonPrimario, claseBotonSecundario, claseCabeceraTabla, claseCeldaTabla, claseInput, ErrorFormulario, InsigniaNeutra } from '../inventario/ui'
 import { DatoDetalle } from '../recursos-humanos/ui'
-import { InsigniaOrden, TablaRequerimientos } from './ui'
+import OrdenOperaciones from './orden-operaciones'
+import { ArbolBom, InsigniaOrden, TablaRequerimientos } from './ui'
 
 export default function OrdenDetalle({
   orden,
@@ -26,7 +29,8 @@ export default function OrdenDetalle({
   onAccion: (mensaje: string) => void
 }) {
   const { productos, materiasPrimas } = useInventario()
-  const { recetas, ordenes, responsables } = useProduccion()
+  const { recetas, ordenes, responsables, subensambles, rutas } = useProduccion()
+  const { lotes } = useCalidad()
   const [error, setError] = useState<string | null>(null)
   const [cancelando, setCancelando] = useState(false)
   const [motivo, setMotivo] = useState('')
@@ -40,6 +44,13 @@ export default function OrdenDetalle({
     ? requerimientos(receta, orden.cantidadPlanificada, materiasPrimas, materiaComprometida(ordenes, recetas, orden.id))
     : []
   const faltaMateria = lineas.some((l) => l.faltante > 0)
+  const ruta = rutas.filter((r) => r.productoId === orden.productoId).sort((a, b) => a.secuencia - b.secuencia)
+  // Con ruta, la orden se cierra cuando todas sus operaciones están terminadas
+  const motivoNoCompletar = rutaPendiente(orden, rutas)
+    ? orden.estado === 'pendiente' ? 'Inicie la orden y registre sus operaciones' : 'Faltan operaciones de la ruta por terminar'
+    : undefined
+  const lote = lotes.find((l) => l.ordenId === orden.id)
+  const enProcesoEncargado = ordenes.find((o) => o.estado === 'en_proceso' && o.id !== orden.id && o.empleadoId === orden.empleadoId)
 
   const ejecutar = async (accion: () => Promise<{ ok: boolean; error?: string }>, mensaje: string) => {
     setOcupado(true)
@@ -71,11 +82,11 @@ export default function OrdenDetalle({
             {orden.estado === 'pendiente' && (
               <>
                 <button type="button" onClick={onEditar} className={claseBotonSecundario}><Pencil size={15} />Editar</button>
-                <button type="button" disabled={ocupado || faltaMateria} title={faltaMateria ? 'No hay materia prima suficiente' : undefined} onClick={() => ejecutar(() => iniciarOrden(orden.id), 'Orden en proceso')} className={claseBotonSecundario}><Play size={15} />Iniciar</button>
+                <button type="button" disabled={ocupado || faltaMateria} title={faltaMateria ? 'No hay materia prima suficiente' : 'La orden está en cola: puede adelantarla aunque el encargado tenga otra en proceso'} onClick={() => ejecutar(() => iniciarOrden(orden.id), 'Orden en proceso')} className={claseBotonSecundario}><Play size={15} />Iniciar ahora</button>
               </>
             )}
             <button type="button" onClick={() => setCancelando(true)} className={claseBotonSecundario}><XCircle size={15} />Cancelar</button>
-            <button type="button" onClick={onCompletar} className={claseBotonPrimario}><CheckCircle2 size={15} />Completar</button>
+            <button type="button" onClick={onCompletar} disabled={Boolean(motivoNoCompletar)} title={motivoNoCompletar} className={claseBotonPrimario}><CheckCircle2 size={15} />Cerrar orden</button>
           </div>
         )}
       </div>
@@ -104,9 +115,39 @@ export default function OrdenDetalle({
           <>
             <DatoDetalle etiqueta="Costo de materia prima" valor={formatoCordobas(orden.costoMateriales)} />
             <DatoDetalle etiqueta="Costo por unidad" valor={formatoCordobas(costoUnitarioOrden(orden))} />
+            <DatoDetalle
+              etiqueta="Lote"
+              valor={lote ? (
+                <Link href={`/calidad/lotes?detalle=${encodeURIComponent(lote.id)}`} className="inline-flex items-center gap-2 font-mono underline">
+                  {lote.codigo} <InsigniaNeutra>{ETIQUETAS_ESTADO_LOTE[lote.estado]}</InsigniaNeutra>
+                </Link>
+              ) : ''}
+            />
           </>
         )}
+        {ruta.length > 0 && ordenAbierta(orden) && (
+          <DatoDetalle etiqueta="Tiempo estimado (ruta)" valor={formatoMinutos(tiempoEstimadoRuta(ruta, orden.cantidadPlanificada))} />
+        )}
       </dl>
+
+      {motivoNoCompletar && ordenAbierta(orden) && (
+        <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-xs text-zinc-600">
+          {orden.estado === 'pendiente'
+            ? `En cola: ${enProcesoEncargado ? `${responsable?.nombre ?? 'el personal sin asignar'} está trabajando la orden ${enProcesoEncargado.codigo}; esta arrancará sola cuando la cierre.` : 'arrancará cuando el encargado quede libre.'} Al iniciar se crean sus ${ruta.length} operaciones de la ruta.`
+            : 'La orden se podrá cerrar cuando todas las operaciones de la ruta estén terminadas.'}
+        </p>
+      )}
+
+      {orden.operaciones.length > 0 && <OrdenOperaciones orden={orden} onAccion={onAccion} />}
+
+      {receta && receta.estructura.some((l) => l.tipo === 'subensamble') && (
+        <div>
+          <h3 className="text-sm font-semibold text-zinc-900 mb-2">Estructura (BOM) para {formatoCantidad(orden.cantidadPlanificada)} und</h3>
+          <div className="rounded-lg border border-zinc-200 px-4 py-3">
+            <ArbolBom estructura={receta.estructura} subensambles={subensambles} materiasPrimas={materiasPrimas} multiplicador={orden.cantidadPlanificada} />
+          </div>
+        </div>
+      )}
 
       {orden.observaciones && (
         <div>

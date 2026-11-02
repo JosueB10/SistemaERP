@@ -81,8 +81,14 @@ export default function OrdenFormulario({
     )
     setEnviando(false)
     if (!resultado.ok) { setErrorGeneral(resultado.error); return }
-    onGuardado(orden ? 'Orden actualizada' : 'Orden de producción creada')
+    onGuardado(resultado.iniciada
+      ? `Orden ${orden ? 'actualizada' : 'creada'} y en proceso: registre sus operaciones en el detalle`
+      : orden ? 'Orden actualizada' : `Orden creada: quedó en cola hasta que ${encargado} termine su orden actual`)
   }
+
+  // Cada encargado trabaja una orden a la vez: si está libre, la orden arranca sola
+  const encargado = responsables.find((r) => r.id === valores.empleadoId)?.nombre ?? 'el personal sin asignar'
+  const ocupadaCon = ordenes.find((o) => o.estado === 'en_proceso' && o.id !== orden?.id && (o.empleadoId ?? '') === valores.empleadoId)
 
   return (
     <form onSubmit={enviar} noValidate className="space-y-5">
@@ -155,6 +161,14 @@ export default function OrdenFormulario({
             ? 'Se acabó la materia prima para este producto: no se puede crear la orden hasta que se registre una compra.'
             : `No se puede ${orden ? 'guardar' : 'crear'} la orden: faltan ${faltantes.map((l) => `${formatoCantidad(l.faltante)} ${l.unidad} de ${l.nombre}`).join(', ')}. Reduzca la cantidad a ${formatoCantidad(capacidad ?? 0)} und o compre más materia prima.`}
         </div>
+      )}
+
+      {(!orden || orden.empleadoId !== (valores.empleadoId || undefined)) && (
+        <p className={`rounded-lg border px-4 py-2.5 text-xs ${ocupadaCon ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>
+          {ocupadaCon
+            ? `${encargado.charAt(0).toUpperCase()}${encargado.slice(1)} ya tiene la orden ${ocupadaCon.codigo} en proceso: esta quedará en cola y arrancará sola cuando la cierre. Asígnela a otro encargado si quiere fabricarla al mismo tiempo.`
+            : 'El encargado está libre: la orden se iniciará automáticamente al guardarla.'}
+        </p>
       )}
 
       <PieFormulario onCancelar={onCancelar} textoGuardar={orden ? 'Guardar cambios' : 'Crear orden'} enviando={enviando} deshabilitado={sinMateria || faltantes.length > 0} />

@@ -201,7 +201,7 @@ export default function ComprasVista() {
                       <td className={claseCeldaTabla}>{c.numeroFactura ?? '—'}</td>
                       <td className={`${claseCeldaTabla} text-right`}>{c.lineas.length}</td>
                       <td className={`${claseCeldaTabla} text-right font-semibold ${c.estado === 'anulada' ? 'line-through text-zinc-400' : 'text-zinc-900'}`}>{formatoCordobas(c.total)}</td>
-                      <td className={claseCeldaTabla}><InsigniaDocumento anulado={c.estado === 'anulada'} texto={ETIQUETAS_ESTADO_COMPRA[c.estado]} /></td>
+                      <td className={claseCeldaTabla}><InsigniaDocumento anulado={c.estado === 'anulada'} pendiente={c.estado === 'pendiente'} texto={ETIQUETAS_ESTADO_COMPRA[c.estado]} /></td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         <button type="button" onClick={() => abrirDetalle(c.id)} className={claseBotonTabla}><Eye size={14} />Ver</button>
                       </td>

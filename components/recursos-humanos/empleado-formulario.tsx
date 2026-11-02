@@ -4,10 +4,11 @@ import { useState } from 'react'
 
 import { categoriasUnicas, fechaHoy, formatoCordobas, validarNumero } from '@/lib/inventario/utilidades'
 import { guardarEmpleado, useRecursosHumanos } from '@/lib/recursos-humanos/store'
-import type { Empleado, EstadoEmpleado, TipoContrato } from '@/lib/recursos-humanos/tipos'
+import type { Empleado, EstadoEmpleado, TipoContrato, TipoPago } from '@/lib/recursos-humanos/tipos'
 import {
   ETIQUETAS_CONTRATO,
   ETIQUETAS_ESTADO_EMPLEADO,
+  ETIQUETAS_TIPO_PAGO,
   salarioDiario,
   siguienteCodigo
 } from '@/lib/recursos-humanos/utilidades'
@@ -48,6 +49,7 @@ export default function EmpleadoFormulario({
     direccion: empleado?.direccion ?? '',
     fechaIngreso: empleado?.fechaIngreso ?? fechaHoy(),
     tipoContrato: empleado?.tipoContrato ?? ('indefinido' as TipoContrato),
+    tipoPago: empleado?.tipoPago ?? ('fijo' as TipoPago),
     salarioMensual: empleado ? String(empleado.salarioMensual) : '',
     estado: empleado?.estado ?? ('activo' as EstadoEmpleado)
   })
@@ -61,9 +63,12 @@ export default function EmpleadoFormulario({
   }
 
   const salario = Number(valores.salarioMensual)
-  const ayudaSalario = valores.salarioMensual !== '' && salario > 0
-    ? `Salario diario: ${formatoCordobas(salarioDiario(salario))}`
-    : 'Salario bruto mensual, antes de deducciones.'
+  const esDestajo = valores.tipoPago === 'destajo'
+  const ayudaSalario = esDestajo
+    ? 'Si lo que produce en el período no alcanza, se le completa hasta este monto (nunca menos del salario mínimo de su sector).'
+    : valores.salarioMensual !== '' && salario > 0
+      ? `Salario diario: ${formatoCordobas(salarioDiario(salario))}`
+      : 'Salario bruto mensual, antes de deducciones.'
 
   const enviar = async (evento: React.FormEvent) => {
     evento.preventDefault()
@@ -82,7 +87,7 @@ export default function EmpleadoFormulario({
     }
     if (!valores.fechaIngreso) nuevosErrores.fechaIngreso = 'La fecha de ingreso es obligatoria.'
 
-    const salarioMensual = validarNumero(valores.salarioMensual, { etiqueta: 'El salario mensual', mayorQueCero: true })
+    const salarioMensual = validarNumero(valores.salarioMensual, { etiqueta: esDestajo ? 'El salario mínimo garantizado' : 'El salario mensual', mayorQueCero: true })
     if (salarioMensual.error) nuevosErrores.salarioMensual = salarioMensual.error
 
     setErrores(nuevosErrores)
@@ -104,6 +109,7 @@ export default function EmpleadoFormulario({
         fechaIngreso: valores.fechaIngreso,
         fechaBaja: empleado?.fechaBaja,
         tipoContrato: valores.tipoContrato,
+        tipoPago: valores.tipoPago,
         salarioMensual: salarioMensual.valor!,
         estado: valores.estado
       },
@@ -178,7 +184,16 @@ export default function EmpleadoFormulario({
           </select>
         </Campo>
 
-        <Campo etiqueta="Salario mensual (C$)" htmlFor="empleado-salarioMensual" error={errores.salarioMensual} ayuda={ayudaSalario} requerido>
+        <Campo etiqueta="Forma de pago" htmlFor="empleado-tipoPago" requerido
+          ayuda={esDestajo ? 'Cobra por cada pieza buena que produce, según la tarifa de cada centro de trabajo.' : undefined}>
+          <select id="empleado-tipoPago" value={valores.tipoPago} onChange={(e) => cambiar('tipoPago', e.target.value)} className={claseInput}>
+            {(Object.keys(ETIQUETAS_TIPO_PAGO) as TipoPago[]).map((tipo) => (
+              <option key={tipo} value={tipo}>{ETIQUETAS_TIPO_PAGO[tipo]}</option>
+            ))}
+          </select>
+        </Campo>
+
+        <Campo etiqueta={esDestajo ? 'Mínimo garantizado mensual (C$)' : 'Salario mensual (C$)'} htmlFor="empleado-salarioMensual" error={errores.salarioMensual} ayuda={ayudaSalario} requerido>
           <input
             id="empleado-salarioMensual"
             type="number"

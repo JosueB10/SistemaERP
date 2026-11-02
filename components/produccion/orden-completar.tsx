@@ -25,7 +25,10 @@ export default function OrdenCompletar({
   const receta = recetaDeProducto(recetas, orden.productoId)
   const porId = new Map(materiasPrimas.map((m) => [m.id, m]))
 
-  const [cantidad, setCantidad] = useState(String(orden.cantidadPlanificada))
+  // Con ruta, lo producido es lo bueno que dejó la última operación
+  const ultimaOperacion = orden.operaciones[orden.operaciones.length - 1]
+  const maximo = ultimaOperacion ? ultimaOperacion.cantidadBuena : undefined
+  const [cantidad, setCantidad] = useState(String(maximo ?? orden.cantidadPlanificada))
   const [fechaFin, setFechaFin] = useState(fechaHoy())
   const [observaciones, setObservaciones] = useState('')
   // Materias primas agregadas a mano (además de las de la receta)
@@ -56,6 +59,7 @@ export default function OrdenCompletar({
     setErrorGeneral(null)
     const cantidadValida = validarNumero(cantidad, { etiqueta: 'La cantidad producida', mayorQueCero: true, entero: true })
     if (cantidadValida.error) { setErrorGeneral(cantidadValida.error); return }
+    if (maximo !== undefined && cantidadValida.valor! > maximo) { setErrorGeneral(`La última operación de la ruta dejó ${formatoCantidad(maximo)} pieza(s) buenas.`); return }
     if (!fechaFin || fechaFin > fechaHoy()) { setErrorGeneral('La fecha de finalización no puede estar vacía ni ser futura.'); return }
 
     const nuevosErrores: Record<string, string> = {}
@@ -84,7 +88,7 @@ export default function OrdenCompletar({
       <ErrorFormulario mensaje={errorGeneral} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Campo etiqueta="Cantidad producida (und)" htmlFor="completar-cantidad" ayuda={`Planificado: ${formatoCantidad(orden.cantidadPlanificada)} und de ${producto?.nombre ?? 'producto'}.`} requerido>
+        <Campo etiqueta="Cantidad producida (und)" htmlFor="completar-cantidad" ayuda={`Planificado: ${formatoCantidad(orden.cantidadPlanificada)} und de ${producto?.nombre ?? 'producto'}.${maximo !== undefined ? ` Buenas en la última operación: ${formatoCantidad(maximo)}.` : ''}`} requerido>
           <input id="completar-cantidad" type="number" min="1" step="1" inputMode="numeric" value={cantidad} onChange={(e) => { setCantidad(e.target.value); setErrorGeneral(null) }} className={claseInput} />
         </Campo>
         <Campo etiqueta="Fecha de finalización" htmlFor="completar-fecha" requerido>
@@ -95,7 +99,7 @@ export default function OrdenCompletar({
       <div>
         <p className="text-xs font-medium text-zinc-700">Materia prima consumida</p>
         <p className="text-xs text-zinc-400 mb-2">
-          Se calcula con la receta. Ajuste el consumo real si hubo merma o sobrante; esto es lo que se descuenta del inventario.
+          Explosión de la BOM: la materia prima directa más la de los subensambles. Ajuste el consumo real si hubo merma o sobrante; esto es lo que se descuenta del inventario.
         </p>
         <div className="overflow-x-auto rounded-lg border border-zinc-200">
           <table className="w-full min-w-[620px]">

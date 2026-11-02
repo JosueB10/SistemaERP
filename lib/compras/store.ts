@@ -71,10 +71,13 @@ const mapCompra = (r: Fila): Compra => ({
   descuento: numero(r.descuento),
   impuesto: numero(r.impuesto),
   total: numero(r.total),
-  estado: r.estado === 'anulada' ? 'anulada' : 'completada',
+  estado: r.estado === 'anulada' ? 'anulada' : r.estado === 'pendiente' ? 'pendiente' : 'completada',
   observaciones: opcional(r.observaciones),
   anuladaEn: opcional(r.anulada_en),
   motivoAnulacion: opcional(r.motivo_anulacion),
+  fechaEntregaEsperada: opcional(r.fecha_entrega_esperada),
+  fechaRecepcion: opcional(r.fecha_recepcion),
+  observacionesRecepcion: opcional(r.observaciones_recepcion),
   lineas: ((r.compra_detalle as Fila[] | null) ?? []).map(mapLinea)
 })
 
@@ -166,11 +169,22 @@ export async function registrarCompra(e: CompraEntrada): Promise<ResultadoAccion
     p_aplica_iva: e.aplicaIva,
     p_actualizar_costo: e.actualizarCosto,
     p_observaciones: e.observaciones.trim() || null,
-    p_detalles: e.lineas.map((l) => ({ materia_prima_id: Number(l.materiaPrimaId), cantidad: l.cantidad, costo_unitario: l.costoUnitario }))
+    p_detalles: e.lineas.map((l) => ({ materia_prima_id: Number(l.materiaPrimaId), cantidad: l.cantidad, costo_unitario: l.costoUnitario })),
+    p_recibir: e.recibir,
+    p_fecha_entrega_esperada: e.recibir ? null : e.fechaEntregaEsperada || null
   })
   if (save.error) return resultado(save.error)
   const recarga = await recargar(true)
   return recarga.ok ? { ok: true, id: String(save.data) } : recarga
+}
+
+// Recepción de una orden de compra: entra la materia prima, se actualiza el costo y se registra el gasto
+export async function recibirCompra(id: string, fecha: string, observaciones: string): Promise<ResultadoAccion> {
+  const sesion = await validarSesion()
+  if (!sesion.ok) return sesion
+  const save = await supabase.rpc('recibir_compra', { p_compra_id: Number(id), p_fecha: fecha, p_observaciones: observaciones.trim() || null })
+  if (save.error) return resultado(save.error)
+  return recargar(true)
 }
 
 export async function anularCompra(id: string, motivo: string): Promise<ResultadoAccion> {

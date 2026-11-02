@@ -3,7 +3,10 @@
 // pendiente: falta producir parte de lo vendido; aún no movió inventario ni dinero
 export type EstadoVenta = 'pendiente' | 'completada' | 'anulada'
 
-export type MetodoPago = 'efectivo' | 'tarjeta' | 'transferencia' | 'credito'
+// Logística de una venta completada
+export type EstadoDespacho = 'por_despachar' | 'despachada' | 'entregada'
+
+export type MetodoPago ='efectivo' | 'tarjeta' | 'transferencia' | 'credito'
 
 export interface Cliente {
   id: string
@@ -46,7 +49,24 @@ export interface Venta {
   completadaEn?: string
   anuladaEn?: string
   motivoAnulacion?: string
+  estadoDespacho: EstadoDespacho
+  fechaDespacho?: string
+  guiaDespacho?: string
+  transportista?: string
+  direccionEntrega?: string
+  // Códigos de los lotes enviados (trazabilidad)
+  lotesDespacho?: string
+  fechaEntrega?: string
+  recibidoPor?: string
   lineas: LineaVenta[]
+}
+
+export interface DespachoEntrada {
+  fecha: string
+  guia: string
+  transportista: string
+  direccion: string
+  lotes: string
 }
 
 export interface DatosVentas {

@@ -10,6 +10,7 @@ import {
   antiguedad,
   ETIQUETAS_CONTRATO,
   ETIQUETAS_ESTADO_EMPLEADO,
+  ETIQUETAS_TIPO_PAGO,
   iniciales,
   nombreCompleto,
   salarioDiario
@@ -155,7 +156,10 @@ export default function EmpleadosVista() {
                     <td className={claseCeldaTabla}>{empleado.cargo}</td>
                     <td className={claseCeldaTabla}>{empleado.area || <span className="text-zinc-400">—</span>}</td>
                     <td className={claseCeldaTabla}>{formatoFecha(empleado.fechaIngreso)}</td>
-                    <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>{formatoCordobas(empleado.salarioMensual)}</td>
+                    <td className={`${claseCeldaTabla} text-right font-semibold text-zinc-900`}>
+                      {formatoCordobas(empleado.salarioMensual)}
+                      {empleado.tipoPago === 'destajo' && <p className="text-[11px] font-normal text-zinc-400">destajo · mínimo garantizado</p>}
+                    </td>
                     <td className={claseCeldaTabla}><InsigniaEmpleado estado={empleado.estado} /></td>
                     <td className={`${claseCeldaTabla} text-right`}>
                       <div className="inline-flex gap-1">
@@ -266,7 +270,8 @@ function DetalleEmpleado({
         <DatoDetalle etiqueta="Fecha de ingreso" valor={formatoFecha(empleado.fechaIngreso)} />
         <DatoDetalle etiqueta="Antigüedad" valor={antiguedad(empleado.fechaIngreso, empleado.fechaBaja ?? hoy)} />
         <DatoDetalle etiqueta="Contrato" valor={ETIQUETAS_CONTRATO[empleado.tipoContrato]} />
-        <DatoDetalle etiqueta="Salario mensual" valor={formatoCordobas(empleado.salarioMensual)} />
+        <DatoDetalle etiqueta="Forma de pago" valor={ETIQUETAS_TIPO_PAGO[empleado.tipoPago]} />
+        <DatoDetalle etiqueta={empleado.tipoPago === 'destajo' ? 'Mínimo garantizado mensual' : 'Salario mensual'} valor={formatoCordobas(empleado.salarioMensual)} />
         <DatoDetalle etiqueta="Salario diario" valor={formatoCordobas(salarioDiario(empleado.salarioMensual))} />
         {empleado.fechaBaja && <DatoDetalle etiqueta="Fecha de baja" valor={formatoFecha(empleado.fechaBaja)} />}
       </dl>

@@ -12,6 +12,7 @@ import {
   Users,
   FileText,
   ChevronRight,
+  ShieldCheck,
   X
 } from 'lucide-react'
 
@@ -62,8 +63,24 @@ const grupos: { titulo: string; items: MenuItem[] }[] = [
         icon: Factory,
         children: [
           { label: 'Órdenes', href: '/produccion' },
-          { label: 'Recetas', href: '/produccion/recetas' },
+          { label: 'Recetas (BOM)', href: '/produccion/recetas' },
+          { label: 'Subensambles', href: '/produccion/subensambles' },
+          { label: 'Plantas', href: '/produccion/plantas' },
+          { label: 'Centros de trabajo', href: '/produccion/centros-trabajo' },
+          { label: 'Rutas', href: '/produccion/rutas' },
+          { label: 'Indicadores OEE', href: '/produccion/indicadores' },
+          { label: 'Monitoreo IIoT', href: '/produccion/iiot' },
+          { label: 'Análisis IIoT', href: '/produccion/iiot/analisis' },
+          { label: 'Energía y CO₂', href: '/produccion/energia' },
           { label: 'Historial', href: '/produccion/historial' }
+        ]
+      },
+      {
+        label: 'Calidad',
+        icon: ShieldCheck,
+        children: [
+          { label: 'Lotes', href: '/calidad/lotes' },
+          { label: 'No conformidades', href: '/calidad/no-conformidades' }
         ]
       },
       {
@@ -96,7 +113,8 @@ const grupos: { titulo: string; items: MenuItem[] }[] = [
           { label: 'Resumen', href: '/recursos-humanos' },
           { label: 'Empleados', href: '/recursos-humanos/empleados' },
           { label: 'Asistencia', href: '/recursos-humanos/asistencia' },
-          { label: 'Nómina', href: '/recursos-humanos/nomina' }
+          { label: 'Nómina', href: '/recursos-humanos/nomina' },
+          { label: 'Productividad', href: '/recursos-humanos/productividad' }
         ]
       },
       { label: 'Reportes', href: '/reportes', icon: FileText }

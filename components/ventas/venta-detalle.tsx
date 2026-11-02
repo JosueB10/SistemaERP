@@ -14,6 +14,7 @@ import { ETIQUETAS_ESTADO_VENTA, ETIQUETAS_METODO_PAGO, margenVenta } from '@/li
 import { claseBotonPrimario, claseCabeceraTabla, claseCeldaTabla, ErrorFormulario } from '../inventario/ui'
 import { DatoDetalle } from '../recursos-humanos/ui'
 import { ConfirmarAnulacion, InsigniaDocumento, ResumenTotales } from './ui'
+import VentaDespacho from './venta-despacho'
 
 export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAccion: (mensaje: string) => void }) {
   const { productos } = useInventario()
@@ -137,6 +138,8 @@ export default function VentaDetalle({ venta, onAccion }: { venta: Venta; onAcci
           <DatoDetalle etiqueta="Completada" valor={formatoFecha(venta.completadaEn)} />
         )}
       </dl>
+
+      <VentaDespacho key={`${venta.id}-${venta.estadoDespacho}`} venta={venta} onAccion={onAccion} />
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200">
         <table className="w-full min-w-[520px]">

@@ -194,7 +194,15 @@ function DetalleNomina({ nomina, onAccion }: { nomina: Nomina; onAccion: (mensaj
                     <p className="font-medium text-zinc-900">{empleado ? nombreCompleto(empleado) : 'Empleado eliminado'}</p>
                     {empleado && <p className="text-xs text-zinc-400">{empleado.codigo} · {empleado.numeroInss || 'Sin N.º INSS'}</p>}
                   </td>
-                  <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.salarioBase)}</td>
+                  <td className={`${claseCeldaTabla} text-right`}>
+                    {linea.tipoPago === 'destajo' ? (
+                      <>
+                        {formatoCordobas(linea.montoDestajo + linea.septimoDia + linea.ajusteMinimo)}
+                        <p className="text-[11px] text-zinc-500">Destajo: {linea.piezas} pz · {formatoCordobas(linea.montoDestajo)}</p>
+                        <p className="text-[11px] text-zinc-500">7.º día {formatoCordobas(linea.septimoDia)}{linea.ajusteMinimo > 0 ? ` · complemento al mínimo ${formatoCordobas(linea.ajusteMinimo)}` : ''}</p>
+                      </>
+                    ) : formatoCordobas(linea.salarioBase)}
+                  </td>
                   <td className={`${claseCeldaTabla} text-right`}>
                     {linea.diasAusencia > 0 ? <span className="text-red-600">{linea.diasAusencia} d · -{formatoCordobas(linea.descuentoAusencias)}</span> : '—'}
                   </td>

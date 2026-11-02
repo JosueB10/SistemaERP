@@ -1,15 +1,15 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { AlertTriangle, CheckCircle2, Clock, Eye, Factory, Plus, Wallet } from 'lucide-react'
 
 import { useInventario } from '@/lib/inventario/store'
 import { coincideBusqueda, fechaHoy, formatoCantidad, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
-import { useProduccion } from '@/lib/produccion/store'
+import { cargarProduccion, useProduccion } from '@/lib/produccion/store'
 import { codigoVenta } from '@/lib/ventas/utilidades'
 import type { EstadoOrden, OrdenProduccion } from '@/lib/produccion/tipos'
-import { ETIQUETAS_ESTADO_ORDEN, materiaComprometida, ordenAbierta, recetaDeProducto, requerimientos, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
+import { ETIQUETAS_ESTADO_ORDEN, materiaComprometida, ordenAbierta, recetaDeProducto, requerimientos, rutaPendiente, tieneMateriaDefinida } from '@/lib/produccion/utilidades'
 import {
   AvisoConexion,
   Buscador,
@@ -44,7 +44,7 @@ type ModalActivo =
 
 export default function OrdenesVista() {
   const { productos, materiasPrimas } = useInventario()
-  const { ordenes, recetas, responsables } = useProduccion()
+  const { ordenes, recetas, responsables, rutas } = useProduccion()
   const { mensaje, mostrar } = useNotificacion()
 
   const [busqueda, setBusqueda] = useState('')
@@ -72,6 +72,14 @@ export default function OrdenesVista() {
     if (detalleId) cerrarDetalle()
     if (productoNueva) router.replace(pathname, { scroll: false })
   }
+
+  // Las máquinas (IIoT) avanzan y cierran órdenes solas: se refresca mientras haya órdenes en proceso
+  const hayEnProceso = ordenes.some((o) => o.estado === 'en_proceso')
+  useEffect(() => {
+    if (!hayEnProceso) return
+    const temporizador = setInterval(() => { cargarProduccion(true).catch(() => undefined) }, 10000)
+    return () => clearInterval(temporizador)
+  }, [hayEnProceso])
 
   const productoPorId = useMemo(() => new Map(productos.map((p) => [p.id, p])), [productos])
   const responsablePorId = useMemo(() => new Map(responsables.map((r) => [r.id, r])), [responsables])
@@ -204,11 +212,16 @@ export default function OrdenesVista() {
                             <Eye size={14} />
                             Ver
                           </button>
-                          {ordenAbierta(orden) && (
+                          {ordenAbierta(orden) && !rutaPendiente(orden, rutas) && (
                             <button type="button" onClick={() => setModal({ tipo: 'completar', ordenId: orden.id })} className={claseBotonTabla}>
                               <CheckCircle2 size={14} />
-                              Completar
+                              Cerrar
                             </button>
+                          )}
+                          {orden.estado === 'en_proceso' && orden.operaciones.length > 0 && rutaPendiente(orden, rutas) && (
+                            <span className="inline-flex items-center px-2 text-xs text-sky-700">
+                              Paso {orden.operaciones.filter((o) => o.estado === 'completada').length + 1}/{orden.operaciones.length}
+                            </span>
                           )}
                         </div>
                       </td>
@@ -249,8 +262,8 @@ export default function OrdenesVista() {
 
       <Modal
         abierto={modal?.tipo === 'completar' && Boolean(ordenModal)}
-        titulo={ordenModal ? `Completar orden ${ordenModal.codigo}` : 'Completar orden'}
-        descripcion="Se descontará la materia prima y el producto terminado entrará al inventario."
+        titulo={ordenModal ? `Cerrar orden ${ordenModal.codigo}` : 'Cerrar orden'}
+        descripcion="Se explota la BOM y se descuenta la materia prima, el producto terminado entra al inventario y se crea el lote para Calidad."
         onCerrar={cerrar}
         ancho="max-w-3xl"
       >

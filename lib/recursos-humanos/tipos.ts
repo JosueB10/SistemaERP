@@ -8,6 +8,9 @@ export type EstadoAsistencia = 'presente' | 'tardanza' | 'ausente' | 'permiso' |
 
 export type Periodicidad = 'quincenal' | 'mensual'
 
+// Fijo: salario mensual. Destajo: se paga por pieza buena producida, con el salario mensual como mínimo garantizado
+export type TipoPago = 'fijo' | 'destajo'
+
 export type EstadoNomina = 'borrador' | 'pagada'
 
 export interface Empleado {
@@ -25,6 +28,8 @@ export interface Empleado {
   fechaIngreso: string
   fechaBaja?: string
   tipoContrato: TipoContrato
+  tipoPago: TipoPago
+  // Fijo: salario del mes. Destajo: mínimo garantizado si lo producido no alcanza
   salarioMensual: number
   estado: EstadoEmpleado
 }
@@ -41,7 +46,13 @@ export interface Asistencia {
 // Montos calculados de un empleado dentro de una planilla
 export interface LineaNomina {
   empleadoId: string
+  tipoPago: TipoPago
   salarioBase: number
+  // Destajo: piezas buenas pagadas, su monto, el séptimo día y lo que se completa hasta el mínimo
+  piezas: number
+  montoDestajo: number
+  septimoDia: number
+  ajusteMinimo: number
   diasAusencia: number
   descuentoAusencias: number
   horasExtra: number

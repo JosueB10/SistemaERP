@@ -6,7 +6,7 @@ import { cargarInventario } from '../inventario/store'
 import { cargarProduccion } from '../produccion/store'
 import type { ResultadoAccion } from '../inventario/tipos'
 import { fechaHoy } from '../inventario/utilidades'
-import type { Cliente, ClienteEntrada, DatosVentas, LineaVenta, MetodoPago, Venta, VentaEntrada } from './tipos'
+import type { Cliente, ClienteEntrada, DatosVentas, DespachoEntrada, LineaVenta, MetodoPago, Venta, VentaEntrada } from './tipos'
 import { codigoCliente, codigoVenta, ETIQUETAS_METODO_PAGO } from './utilidades'
 
 const vacio: DatosVentas = { ventas: [], clientes: [] }
@@ -78,6 +78,14 @@ const mapVenta = (r: Fila): Venta => ({
   completadaEn: opcional(r.completada_en),
   anuladaEn: opcional(r.anulada_en),
   motivoAnulacion: opcional(r.motivo_anulacion),
+  estadoDespacho: r.estado_despacho === 'despachada' || r.estado_despacho === 'entregada' ? r.estado_despacho : 'por_despachar',
+  fechaDespacho: opcional(r.fecha_despacho),
+  guiaDespacho: opcional(r.guia_despacho),
+  transportista: opcional(r.transportista),
+  direccionEntrega: opcional(r.direccion_entrega),
+  lotesDespacho: opcional(r.lotes_despacho),
+  fechaEntrega: opcional(r.fecha_entrega),
+  recibidoPor: opcional(r.recibido_por),
   lineas: ((r.venta_detalle as Fila[] | null) ?? []).map(mapLinea)
 })
 
@@ -184,6 +192,31 @@ export async function completarVenta(id: string): Promise<ResultadoAccion> {
   const save = await supabase.rpc('completar_venta', { p_venta_id: Number(id), p_fecha: fechaHoy() })
   if (save.error) return resultado(save.error)
   return recargar(true)
+}
+
+// ---------- Despacho y entrega ----------
+
+export async function registrarDespacho(id: string, e: DespachoEntrada): Promise<ResultadoAccion> {
+  const sesion = await validarSesion()
+  if (!sesion.ok) return sesion
+  const save = await supabase.rpc('registrar_despacho', {
+    p_venta_id: Number(id),
+    p_fecha: e.fecha,
+    p_guia: e.guia.trim() || null,
+    p_transportista: e.transportista.trim() || null,
+    p_direccion: e.direccion.trim() || null,
+    p_lotes: e.lotes.trim() || null
+  })
+  if (save.error) return resultado(save.error)
+  return recargar()
+}
+
+export async function confirmarEntrega(id: string, fecha: string, recibidoPor: string): Promise<ResultadoAccion> {
+  const sesion = await validarSesion()
+  if (!sesion.ok) return sesion
+  const save = await supabase.rpc('confirmar_entrega', { p_venta_id: Number(id), p_fecha: fecha, p_recibido_por: recibidoPor.trim() || null })
+  if (save.error) return resultado(save.error)
+  return recargar()
 }
 
 export async function anularVenta(id: string, motivo: string): Promise<ResultadoAccion> {
