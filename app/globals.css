@@ -3,14 +3,13 @@
 /* 1. Variables Globales y Tema Base */
 :root {
   color-scheme: light;
-  --background: #f7f7f8;
+  --background: #f8fafc; /* Unificado con --bg-body para evitar inconsistencias */
   --foreground: #18181b;
 
-  /* Variables complementarias */
+  /* Variables complementarias para componentes ERP */
   --primary-color: #1e293b;     /* Azul marino oscuro para cabeceras y sidebar */
   --accent-color: #2563eb;      /* Azul brillante para acciones principales */
   --accent-hover: #1d4ed8;      /* Hover del botón principal */
-  --bg-body: #f8fafc;           /* Gris súper claro para el fondo general */
   --bg-surface: #ffffff;        /* Blanco puro para tarjetas y contenedores */
   --text-main: #334155;
   --border-color: #e2e8f0;
@@ -26,14 +25,15 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+/* 2. Estilos Base */
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-feature-settings: "cv11", "ss01";
   line-height: 1.5;
 }
@@ -54,7 +54,7 @@ textarea::placeholder {
   color: #ffffff;
 }
 
-/* Animaciones para modales, menús y alertas */
+/* 3. Animaciones */
 @keyframes aparecer {
   from {
     opacity: 0;
@@ -76,7 +76,7 @@ textarea::placeholder {
   }
 }
 
-/* Barras de desplazamiento */
+/* 4. Barras de desplazamiento (Corregido el selector '-') */
 * {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
@@ -102,20 +102,20 @@ textarea::placeholder {
   background: transparent;
 }
 
-/* Clases complementarias para componentes tradicionales */
+/* 5. Componentes Tradicionales (Clases ERP) */
 .card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 24px;
+  border-radius: 0.5rem; /* 8px */
+  padding: 1.5rem;     /* 24px */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .table-container {
   overflow-x: auto;
   background: var(--bg-surface);
-  border-radius: 8px;
+  border-radius: 0.5rem;
   border: 1px solid var(--border-color);
 }
 
@@ -128,14 +128,14 @@ textarea::placeholder {
 .table-erp th {
   background-color: var(--primary-color);
   color: #ffffff;
-  padding: 14px 16px;
+  padding: 0.875rem 1rem;
   font-weight: 500;
   font-size: 0.9rem;
   white-space: nowrap;
 }
 
 .table-erp td {
-  padding: 12px 16px;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-color);
   font-size: 0.9rem;
   color: var(--text-main);
@@ -154,16 +154,17 @@ textarea::placeholder {
   margin-bottom: 0.5rem;
   font-weight: 500;
   font-size: 0.9rem;
+  color: var(--text-main);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: #fff;
+  border-radius: 0.375rem; /* 6px */
+  background-color: var(--bg-surface);
   color: var(--text-main);
   transition: all 0.2s ease;
   font-size: 0.95rem;
@@ -181,8 +182,8 @@ textarea::placeholder {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 18px;
-  border-radius: 6px;
+  padding: 0.625rem 1.125rem;
+  border-radius: 0.375rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -219,7 +220,7 @@ textarea::placeholder {
 }
 
 .badge {
-  padding: 4px 10px;
+  padding: 0.25rem 0.625rem;
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
