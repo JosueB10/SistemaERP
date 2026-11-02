@@ -1,43 +1,116 @@
-/* 1. Variables Globales (Tema Moderno para ERP) */
+@import "tailwindcss";
+
+/* 1. Variables Globales y Tema Base */
 :root {
+  color-scheme: light;
+  --background: #f7f7f8;
+  --foreground: #18181b;
+
+  /* Variables complementarias */
   --primary-color: #1e293b;     /* Azul marino oscuro para cabeceras y sidebar */
   --accent-color: #2563eb;      /* Azul brillante para acciones principales */
   --accent-hover: #1d4ed8;      /* Hover del botón principal */
-  --bg-body: #f8fafc;           /* Gris súper claro para el fondo general (evita fatiga visual) */
+  --bg-body: #f8fafc;           /* Gris súper claro para el fondo general */
   --bg-surface: #ffffff;        /* Blanco puro para tarjetas y contenedores */
   --text-main: #334155;
   --border-color: #e2e8f0;
 
-
-  --success-bg: #d1fae5; --success-text: #065f46;
-  --warning-bg: #fef3c7; --warning-text: #92400e;
-  --danger-bg:  #fee2e2; --danger-text:  #991b1b;
+  --success-bg: #d1fae5;
+  --success-text: #065f46;
+  --warning-bg: #fef3c7;
+  --warning-text: #92400e;
+  --danger-bg: #fee2e2;
+  --danger-text: #991b1b;
 }
 
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background-color: var(--bg-body);
-  color: var(--text-main);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
   line-height: 1.5;
 }
 
+input,
+select,
+textarea {
+  color: var(--foreground);
+}
 
+input::placeholder,
+textarea::placeholder {
+  color: #a1a1aa;
+}
+
+::selection {
+  background-color: var(--accent-color);
+  color: #ffffff;
+}
+
+/* Animaciones para modales, menús y alertas */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-aparecer {
+  animation: aparecer 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-aparecer {
+    animation: none;
+  }
+}
+
+/* Barras de desplazamiento */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Clases complementarias para componentes tradicionales */
 .card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
 }
-
 
 .table-container {
   overflow-x: auto;
@@ -72,7 +145,6 @@ body {
   background-color: #f1f5f9;
 }
 
-
 .form-group {
   margin-bottom: 1.2rem;
 }
@@ -84,13 +156,9 @@ body {
   font-size: 0.9rem;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="password"],
-input[type="date"],
-select,
-textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color);
@@ -101,14 +169,13 @@ textarea {
   font-size: 0.95rem;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
   border-color: var(--accent-color);
   outline: none;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
-
 
 .btn {
   display: inline-flex;
@@ -142,6 +209,14 @@ textarea:focus {
   background-color: #e2e8f0;
 }
 
+.btn-danger {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
 
 .badge {
   padding: 4px 10px;
@@ -154,42 +229,5 @@ textarea:focus {
 
 .badge-success { background-color: var(--success-bg); color: var(--success-text); }
 .badge-warning { background-color: var(--warning-bg); color: var(--warning-text); }
-.badge-danger { background-color: var(--danger-bg); color: var(--danger-text); }
-
-
-/* Botón de peligro (eliminar) */
-.btn-danger {
-  background-color: #dc2626;
-  color: #ffffff;
-}
-
-.btn-danger:hover {
-  background-color: #b91c1c;
-}
-
-/* Badge informativo */
-.badge-info {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-/* Scrollbar personalizado */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
-}
-
-/* Color de texto seleccionado */
-::selection {
-  background-color: var(--accent-color);
-  color: #ffffff;
-}
+.badge-danger  { background-color: var(--danger-bg);  color: var(--danger-text);  }
+.badge-info    { background-color: #dbeafe;           color: #1e40af;            }
