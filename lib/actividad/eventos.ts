@@ -171,8 +171,10 @@ export function eventosActividad(f: FuentesActividad): EventoActividad[] {
       modulo: 'compras',
       fecha: c.fecha,
       momento: momento(c.registradoEn, c.fecha),
-      titulo: `Compra ${c.codigo} a ${proveedor}`,
-      detalle: materiales ? `Entró al inventario: ${materiales}` : 'Compra de materia prima',
+      titulo: c.estado === 'pendiente' ? `Orden de compra ${c.codigo} a ${proveedor}` : `Compra ${c.codigo} a ${proveedor}`,
+      detalle: materiales
+        ? c.estado === 'pendiente' ? `Por recibir: ${materiales}` : `Entró al inventario: ${materiales}`
+        : 'Compra de materia prima',
       monto: c.total,
       documento: c.codigo,
       href

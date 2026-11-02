@@ -15,7 +15,8 @@ import type {
   LineaNomina,
   Nomina,
   NominaEntrada,
-  TipoContrato
+  TipoContrato,
+  TipoPago
 } from './tipos'
 import { totalesNomina } from './utilidades'
 
@@ -60,6 +61,7 @@ const mapEmpleado = (r: Fila): Empleado => ({
   fechaIngreso: texto(r.fecha_ingreso),
   fechaBaja: texto(r.fecha_baja) || undefined,
   tipoContrato: texto(r.tipo_contrato, 'indefinido') as TipoContrato,
+  tipoPago: (r.tipo_pago === 'destajo' ? 'destajo' : 'fijo') as TipoPago,
   salarioMensual: numero(r.salario_mensual),
   estado: texto(r.estado, 'activo') as EstadoEmpleado
 })
@@ -75,7 +77,12 @@ const mapAsistencia = (r: Fila): Asistencia => ({
 
 const mapLinea = (r: Fila): LineaNomina => ({
   empleadoId: String(r.empleado_id),
+  tipoPago: r.tipo_pago === 'destajo' ? 'destajo' : 'fijo',
   salarioBase: numero(r.salario_base),
+  piezas: numero(r.piezas),
+  montoDestajo: numero(r.monto_destajo),
+  septimoDia: numero(r.septimo_dia),
+  ajusteMinimo: numero(r.ajuste_minimo),
   diasAusencia: numero(r.dias_ausencia),
   descuentoAusencias: numero(r.descuento_ausencias),
   horasExtra: numero(r.horas_extra),
@@ -163,6 +170,7 @@ export async function guardarEmpleado(e: EmpleadoEntrada, id?: string): Promise<
     direccion: e.direccion.trim() || null,
     fecha_ingreso: e.fechaIngreso,
     tipo_contrato: e.tipoContrato,
+    tipo_pago: e.tipoPago,
     salario_mensual: e.salarioMensual,
     estado: e.estado,
     fecha_baja: e.estado === 'inactivo' ? e.fechaBaja ?? fechaHoy() : null,
@@ -238,7 +246,12 @@ export async function guardarNomina(e: NominaEntrada): Promise<ResultadoAccion> 
   const detalles = await supabase.from('nomina_detalles').insert(e.lineas.map((l) => ({
     nomina_id: cabecera.data.id,
     empleado_id: l.empleadoId,
+    tipo_pago: l.tipoPago,
     salario_base: l.salarioBase,
+    piezas: l.piezas,
+    monto_destajo: l.montoDestajo,
+    septimo_dia: l.septimoDia,
+    ajuste_minimo: l.ajusteMinimo,
     dias_ausencia: l.diasAusencia,
     descuento_ausencias: l.descuentoAusencias,
     horas_extra: l.horasExtra,

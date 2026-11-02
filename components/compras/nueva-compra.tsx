@@ -48,11 +48,13 @@ export default function NuevaCompra() {
   const [lineas, setLineas] = useState<Linea[]>(() => [nuevaLinea()])
   const [descuentoTexto, setDescuentoTexto] = useState('')
   const [aplicaIva, setAplicaIva] = useState(false)
+  const [recibir, setRecibir] = useState(true)
+  const [fechaEntrega, setFechaEntrega] = useState('')
   const [errores, setErrores] = useState<Record<number, string>>({})
   const [errorProveedor, setErrorProveedor] = useState<string | undefined>()
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
-  const [registrada, setRegistrada] = useState<{ id: string; total: number } | null>(null)
+  const [registrada, setRegistrada] = useState<{ id: string; total: number; recibida: boolean } | null>(null)
   const [nuevoProveedor, setNuevoProveedor] = useState(false)
 
   const materiaPorId = new Map(materiasPrimas.map((m) => [m.id, m]))
@@ -100,6 +102,8 @@ export default function NuevaCompra() {
     setNumeroFactura('')
     setMetodoPago('efectivo')
     setActualizarCosto('promedio')
+    setRecibir(true)
+    setFechaEntrega('')
     setObservaciones('')
     setLineas([nuevaLinea()])
     setDescuentoTexto('')
@@ -149,11 +153,13 @@ export default function NuevaCompra() {
       aplicaIva,
       actualizarCosto,
       observaciones,
+      recibir,
+      fechaEntregaEsperada: fechaEntrega || undefined,
       lineas: definitivas
     })
     setEnviando(false)
     if (!resultado.ok) { setErrorGeneral(resultado.error); return }
-    setRegistrada({ id: resultado.id ?? '', total: totales.total })
+    setRegistrada({ id: resultado.id ?? '', total: totales.total, recibida: recibir })
   }
 
   if (registrada) {
@@ -165,7 +171,9 @@ export default function NuevaCompra() {
             <CheckCircle2 size={24} className="text-emerald-600" />
           </div>
           <p className="text-lg font-semibold text-zinc-900">Compra {codigoCompra(registrada.id)} registrada</p>
-          <p className="text-sm text-zinc-500 mt-1">Total: {formatoCordobas(registrada.total)}. La materia prima ya entró al inventario y se registró el gasto.</p>
+          <p className="text-sm text-zinc-500 mt-1">Total: {formatoCordobas(registrada.total)}. {registrada.recibida
+            ? 'La materia prima ya entró al inventario y se registró el gasto.'
+            : 'Quedó como orden de compra por recibir: al llegar la mercadería, regístrela desde el detalle de la compra.'}</p>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Link href={`/compras?detalle=${encodeURIComponent(registrada.id)}`} className={claseBotonSecundario}>Ver compra</Link>
             <button type="button" onClick={reiniciar} className={claseBotonPrimario}><Plus size={16} />Nueva compra</button>
@@ -216,6 +224,23 @@ export default function NuevaCompra() {
                   {(Object.keys(ETIQUETAS_ACTUALIZACION_COSTO) as ActualizacionCosto[]).map((m) => <option key={m} value={m}>{ETIQUETAS_ACTUALIZACION_COSTO[m]}</option>)}
                 </select>
               </Campo>
+              <div className="sm:col-span-2 flex flex-col gap-3 rounded-lg border border-zinc-200 bg-zinc-50/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <label className="flex items-start gap-2 text-sm text-zinc-700">
+                  <input type="checkbox" checked={recibir} onChange={(e) => setRecibir(e.target.checked)} className="mt-0.5 h-4 w-4 accent-zinc-900" />
+                  <span>
+                    La mercadería ya llegó
+                    <span className="block text-xs text-zinc-400">
+                      {recibir ? 'Entra al inventario y se registra el gasto ahora.' : 'Queda como orden de compra: se recibe después desde el historial de compras.'}
+                    </span>
+                  </span>
+                </label>
+                {!recibir && (
+                  <label className="text-xs text-zinc-500 sm:w-48">
+                    Entrega esperada
+                    <input type="date" min={fecha} value={fechaEntrega} onChange={(e) => setFechaEntrega(e.target.value)} className={`${claseInput} mt-1`} />
+                  </label>
+                )}
+              </div>
             </div>
           </section>
 
@@ -328,7 +353,7 @@ export default function NuevaCompra() {
           <ErrorFormulario mensaje={errorGeneral} />
 
           <button type="submit" disabled={enviando || lineas.every((l) => !l.materiaPrimaId)} className={`${claseBotonPrimario} w-full`}>
-            {enviando ? 'Registrando...' : 'Registrar compra'}
+            {enviando ? 'Registrando...' : recibir ? 'Registrar compra' : 'Crear orden de compra'}
           </button>
         </aside>
       </form>

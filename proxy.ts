@@ -3,9 +3,16 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 // Rutas que se pueden abrir sin haber iniciado sesión
 const RUTAS_PUBLICAS = ['/login']
+// Endpoints de máquinas: no usan sesión de usuario, se autentican con su propia clave (x-api-key)
+const RUTAS_DISPOSITIVOS = ['/api/iiot']
 
 // Antes de servir cualquier página se valida la sesión con Supabase: sin sesión todo redirige al login
 export async function proxy(request: NextRequest) {
+  const rutaSolicitada = request.nextUrl.pathname
+  if (RUTAS_DISPOSITIVOS.some((r) => rutaSolicitada === r || rutaSolicitada.startsWith(`${r}/`))) {
+    return NextResponse.next()
+  }
+
   let respuesta = NextResponse.next({ request })
 
   const supabase = createServerClient(

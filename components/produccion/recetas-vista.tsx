@@ -32,13 +32,13 @@ import {
   usePaginacion
 } from '../inventario/ui'
 import RecetaFormulario from './receta-formulario'
-import { AvisoConexionProduccion, SECCION_PRODUCCION } from './ui'
+import { ArbolBom, AvisoConexionProduccion, SECCION_PRODUCCION } from './ui'
 
 type FiltroReceta = '' | 'con' | 'sin'
 
 export default function RecetasVista() {
   const { productos, materiasPrimas } = useInventario()
-  const { recetas } = useProduccion()
+  const { recetas, subensambles } = useProduccion()
   const { mensaje, mostrar } = useNotificacion()
   const router = useRouter()
   const pathname = usePathname()
@@ -83,8 +83,8 @@ export default function RecetasVista() {
       <AvisoConexion />
       <AvisoConexionProduccion />
       <EncabezadoPagina
-        titulo="Recetas"
-        descripcion="Materia prima que lleva cada producto. Se descuenta del inventario al producir o al vender."
+        titulo="Recetas (BOM)"
+        descripcion="Estructura de cada producto: subensambles (nivel 1) y su materia prima (nivel 2). Al cerrar una orden se explota y se descuenta la materia prima."
         seccion={SECCION_PRODUCCION}
       />
 
@@ -118,7 +118,7 @@ export default function RecetasVista() {
               <thead className="bg-zinc-50/70">
                 <tr>
                   <th className={claseCabeceraTabla}>Producto</th>
-                  <th className={claseCabeceraTabla}>Materia prima por unidad</th>
+                  <th className={claseCabeceraTabla}>Estructura por unidad</th>
                   <th className={`${claseCabeceraTabla} text-right`}>Costo MP</th>
                   <th className={`${claseCabeceraTabla} text-right`}>Costo registrado</th>
                   <th className={`${claseCabeceraTabla} text-right`}>Se pueden fabricar</th>
@@ -126,22 +126,15 @@ export default function RecetasVista() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
-                {visibles.map(({ producto, receta, definida, costo, capacidad, materiales }) => (
+                {visibles.map(({ producto, receta, definida, costo, capacidad }) => (
                   <tr key={producto.id} className="hover:bg-zinc-50/60 align-top">
                     <td className={claseCeldaTabla}>
                       <p className="font-medium text-zinc-900">{producto.nombre}</p>
                       <p className="font-mono text-xs text-zinc-400">{producto.sku}{receta ? ` · v${receta.version}` : ''}</p>
                     </td>
                     <td className={`${claseCeldaTabla} whitespace-normal`}>
-                      {definida ? (
-                        <ul className="space-y-0.5 text-xs">
-                          {materiales.map((m) => (
-                            <li key={m.materiaPrimaId}>
-                              <span className="font-medium text-zinc-800">{formatoCantidad(m.porUnidad)} {m.unidad}</span>{' '}
-                              <span className="text-zinc-500">{m.nombre}</span>
-                            </li>
-                          ))}
-                        </ul>
+                      {definida && receta ? (
+                        <ArbolBom estructura={receta.estructura} subensambles={subensambles} materiasPrimas={materiasPrimas} />
                       ) : (
                         <span className="inline-flex px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-xs font-medium">Sin definir</span>
                       )}

@@ -6,7 +6,8 @@ import type {
   EstadoNomina,
   LineaNomina,
   Periodicidad,
-  TipoContrato
+  TipoContrato,
+  TipoPago
 } from './tipos'
 
 // ---------- Etiquetas ----------
@@ -33,6 +34,11 @@ export const ETIQUETAS_ASISTENCIA: Record<EstadoAsistencia, string> = {
   subsidio: 'Subsidio'
 }
 
+export const ETIQUETAS_TIPO_PAGO: Record<TipoPago, string> = {
+  fijo: 'Salario fijo',
+  destajo: 'Por destajo (por pieza)'
+}
+
 export const ETIQUETAS_PERIODICIDAD: Record<Periodicidad, string> = {
   quincenal: 'Quincenal',
   mensual: 'Mensual'
@@ -54,7 +60,9 @@ export const TASAS_NOMINA = {
   // Las horas extra se pagan al doble del valor de la hora ordinaria
   factorHoraExtra: 2,
   diasPorMes: 30,
-  horasPorDia: 8
+  horasPorDia: 8,
+  // Destajo: lo producido paga 6 días; el séptimo (descanso semanal) se paga como 1/6 de lo producido
+  diasLaboralesSemana: 6
 }
 
 // Tarifa progresiva anual del IR sobre salarios
@@ -84,11 +92,22 @@ export function salarioDiario(salarioMensual: number) {
   return salarioMensual / TASAS_NOMINA.diasPorMes
 }
 
+// Salario fijo: salario del período − ausencias + horas extra + bonos.
+// Destajo (Código del Trabajo y Ley de Salario Mínimo): piezas buenas × tarifa de cada operación, más el
+// séptimo día (1/6 de lo producido). Si eso no llega al mínimo garantizado del período (menos las ausencias),
+// se paga la diferencia como complemento: nunca se paga menos del mínimo.
 export function calcularLinea(
-  empleado: Pick<Empleado, 'id' | 'salarioMensual'>,
+  empleado: Pick<Empleado, 'id' | 'salarioMensual'> & { tipoPago?: TipoPago },
   periodicidad: Periodicidad,
-  variables: { diasAusencia: number; horasExtra: number; bonificaciones: number; otrasDeducciones: number }
+  variables: {
+    diasAusencia: number
+    horasExtra: number
+    bonificaciones: number
+    otrasDeducciones: number
+    destajo?: { piezas: number; monto: number }
+  }
 ): LineaNomina {
+  const tipoPago: TipoPago = empleado.tipoPago === 'destajo' ? 'destajo' : 'fijo'
   const factor = periodosPorMes(periodicidad)
   const salarioBase = redondear(empleado.salarioMensual / factor)
   const diario = salarioDiario(empleado.salarioMensual)
@@ -97,7 +116,20 @@ export function calcularLinea(
   const descuentoAusencias = redondear(Math.min(salarioBase, variables.diasAusencia * diario))
   const montoHorasExtra = redondear(variables.horasExtra * valorHora * TASAS_NOMINA.factorHoraExtra)
   const bonificaciones = redondear(variables.bonificaciones)
-  const totalDevengado = redondear(salarioBase - descuentoAusencias + montoHorasExtra + bonificaciones)
+
+  let piezas = 0
+  let montoDestajo = 0
+  let septimoDia = 0
+  let ajusteMinimo = 0
+  let ordinario = salarioBase - descuentoAusencias
+  if (tipoPago === 'destajo') {
+    piezas = Math.max(0, Math.round(variables.destajo?.piezas ?? 0))
+    montoDestajo = redondear(Math.max(0, variables.destajo?.monto ?? 0))
+    septimoDia = redondear(montoDestajo / TASAS_NOMINA.diasLaboralesSemana)
+    ajusteMinimo = redondear(Math.max(0, salarioBase - descuentoAusencias - montoDestajo - septimoDia))
+    ordinario = montoDestajo + septimoDia + ajusteMinimo
+  }
+  const totalDevengado = redondear(ordinario + montoHorasExtra + bonificaciones)
 
   const inssLaboral = redondear(totalDevengado * TASAS_NOMINA.inssLaboral)
   // El IR se proyecta a un año con el ingreso del período y se prorratea de vuelta
@@ -108,7 +140,12 @@ export function calcularLinea(
 
   return {
     empleadoId: empleado.id,
+    tipoPago,
     salarioBase,
+    piezas,
+    montoDestajo,
+    septimoDia,
+    ajusteMinimo,
     diasAusencia: variables.diasAusencia,
     descuentoAusencias,
     horasExtra: variables.horasExtra,

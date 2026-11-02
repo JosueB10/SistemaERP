@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 import { Info } from 'lucide-react'
 
 import { fechaHoy, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
+import { useProduccion } from '@/lib/produccion/store'
+import { produccionPorEmpleado } from '@/lib/recursos-humanos/productividad'
 import { guardarNomina, useRecursosHumanos } from '@/lib/recursos-humanos/store'
 import type { Periodicidad } from '@/lib/recursos-humanos/tipos'
 import {
@@ -33,6 +35,7 @@ export default function NominaGenerar({
   onGuardado: (mensaje: string) => void
 }) {
   const { empleados, asistencias } = useRecursosHumanos()
+  const { ordenes, centros } = useProduccion()
   const [periodicidad, setPeriodicidad] = useState<Periodicidad>('quincenal')
   const [periodo, setPeriodo] = useState(() => periodoSugerido(fechaHoy(), 'quincenal'))
   const [observaciones, setObservaciones] = useState('')
@@ -42,6 +45,9 @@ export default function NominaGenerar({
   const [enviando, setEnviando] = useState(false)
 
   const incluidos = useMemo(() => empleadosParaNomina(empleados, periodo.fin), [empleados, periodo.fin])
+  // Piezas buenas de las operaciones que cada empleado terminó en el período (para el destajo)
+  const produccion = useMemo(() => produccionPorEmpleado(ordenes, centros, periodo.inicio, periodo.fin), [ordenes, centros, periodo])
+  const hayDestajo = incluidos.some((e) => e.tipoPago === 'destajo')
 
   const filas = useMemo(
     () =>
@@ -58,11 +64,14 @@ export default function NominaGenerar({
           diasAusencia: aNumero(variables.diasAusencia),
           horasExtra: aNumero(variables.horasExtra),
           bonificaciones: aNumero(variables.bonificaciones),
-          otrasDeducciones: aNumero(variables.otrasDeducciones)
+          otrasDeducciones: aNumero(variables.otrasDeducciones),
+          destajo: empleado.tipoPago === 'destajo'
+            ? { piezas: produccion.get(empleado.id)?.piezas ?? 0, monto: produccion.get(empleado.id)?.monto ?? 0 }
+            : undefined
         })
         return { empleado, variables, linea }
       }),
-    [incluidos, asistencias, periodo, periodicidad, ajustes]
+    [incluidos, asistencias, periodo, periodicidad, ajustes, produccion]
   )
   const totales = totalesNomina(filas.map((f) => f.linea))
 
@@ -134,6 +143,13 @@ export default function NominaGenerar({
           INSS laboral {TASAS_NOMINA.inssLaboral * 100} %, IR según tabla progresiva anual,
           INSS patronal {TASAS_NOMINA.inssPatronal * 100} % e INATEC {TASAS_NOMINA.inatec * 100} %.
           Verifique las tasas vigentes con su contador.
+          {hayDestajo && (
+            <>
+              {' '}<strong>Destajo:</strong> se paga cada pieza buena de las operaciones que el empleado terminó en el período,
+              a la tarifa de su centro de trabajo, más el séptimo día (1/6 de lo producido). Si el total no llega a su mínimo
+              garantizado, se le completa la diferencia, como exigen el Código del Trabajo y la Ley de Salario Mínimo.
+            </>
+          )}
         </p>
       </div>
 
@@ -145,7 +161,7 @@ export default function NominaGenerar({
             <thead className="bg-zinc-50/70">
               <tr>
                 <th className={claseCabeceraTabla}>Empleado</th>
-                <th className={`${claseCabeceraTabla} text-right`}>Salario</th>
+                <th className={`${claseCabeceraTabla} text-right`}>Salario / destajo</th>
                 <th className={`${claseCabeceraTabla} text-right`}>Días ausente</th>
                 <th className={`${claseCabeceraTabla} text-right`}>Horas extra</th>
                 <th className={`${claseCabeceraTabla} text-right`}>Bonos</th>
@@ -163,9 +179,17 @@ export default function NominaGenerar({
                   <tr key={empleado.id}>
                     <td className={claseCeldaTabla}>
                       <p className="font-medium text-zinc-900">{nombre}</p>
-                      <p className="text-xs text-zinc-400">{empleado.cargo}</p>
+                      <p className="text-xs text-zinc-400">{empleado.cargo}{empleado.tipoPago === 'destajo' ? ' · destajo' : ''}</p>
                     </td>
-                    <td className={`${claseCeldaTabla} text-right`}>{formatoCordobas(linea.salarioBase)}</td>
+                    <td className={`${claseCeldaTabla} text-right`}>
+                      {linea.tipoPago === 'destajo' ? (
+                        <>
+                          {formatoCordobas(linea.montoDestajo + linea.septimoDia + linea.ajusteMinimo)}
+                          <p className="text-[11px] text-zinc-500">{linea.piezas} pz · {formatoCordobas(linea.montoDestajo)} + 7.º día {formatoCordobas(linea.septimoDia)}</p>
+                          {linea.ajusteMinimo > 0 && <p className="text-[11px] text-amber-700">+{formatoCordobas(linea.ajusteMinimo)} para llegar al mínimo</p>}
+                        </>
+                      ) : formatoCordobas(linea.salarioBase)}
+                    </td>
                     <td className="px-4 py-2 text-right">
                       {entrada(empleado.id, 'diasAusencia', variables.diasAusencia, `Días de ausencia de ${nombre}`)}
                       {linea.descuentoAusencias > 0 && <p className="text-[11px] text-red-600 mt-0.5">-{formatoCordobas(linea.descuentoAusencias)}</p>}

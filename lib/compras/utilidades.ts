@@ -1,6 +1,7 @@
 import type { ActualizacionCosto, EstadoCompra } from './tipos'
 
 export const ETIQUETAS_ESTADO_COMPRA: Record<EstadoCompra, string> = {
+  pendiente: 'Por recibir',
   completada: 'Recibida',
   anulada: 'Anulada'
 }

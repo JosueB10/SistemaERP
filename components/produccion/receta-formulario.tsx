@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Plus, Trash2 } from 'lucide-react'
 
 import { useInventario } from '@/lib/inventario/store'
 import type { Producto } from '@/lib/inventario/tipos'
-import { ABREVIATURAS_UNIDAD, formatoCordobas, validarNumero } from '@/lib/inventario/utilidades'
+import { ABREVIATURAS_UNIDAD, formatoCantidad, formatoCordobas, validarNumero } from '@/lib/inventario/utilidades'
 import { aplicarCostoProducto, guardarReceta, useProduccion } from '@/lib/produccion/store'
-import { recetaDeProducto, redondear3 } from '@/lib/produccion/utilidades'
+import type { LineaEstructura } from '@/lib/produccion/tipos'
+import { costoSubensamble, explotarEstructura, recetaDeProducto, redondear3 } from '@/lib/produccion/utilidades'
 import {
   Campo,
   claseBotonSecundario,
@@ -17,10 +19,17 @@ import {
   PieFormulario
 } from '../inventario/ui'
 
-type Linea = { clave: number; materiaPrimaId: string; cantidad: string }
+// componente: "mp:<id>" para materia prima o "se:<id>" para subensamble
+type Linea = { clave: number; componente: string; cantidad: string }
 
 let siguienteClave = 0
-const nuevaLinea = (materiaPrimaId = '', cantidad = ''): Linea => ({ clave: siguienteClave++, materiaPrimaId, cantidad })
+const nuevaLinea = (componente = '', cantidad = ''): Linea => ({ clave: siguienteClave++, componente, cantidad })
+const claveComponente = (l: LineaEstructura) => `${l.tipo === 'subensamble' ? 'se' : 'mp'}:${l.componenteId}`
+const leerComponente = (valor: string): Pick<LineaEstructura, 'tipo' | 'componenteId'> | null => {
+  const [prefijo, id] = valor.split(':')
+  if (!id) return null
+  return { tipo: prefijo === 'se' ? 'subensamble' : 'materia_prima', componenteId: id }
+}
 
 export default function RecetaFormulario({
   producto,
@@ -32,14 +41,15 @@ export default function RecetaFormulario({
   onGuardado: (mensaje: string) => void
 }) {
   const { materiasPrimas } = useInventario()
-  const { recetas } = useProduccion()
+  const { recetas, subensambles } = useProduccion()
   const receta = recetaDeProducto(recetas, producto.id)
+  const subensamblesActivos = subensambles.filter((s) => s.activo && s.lineas.length > 0)
 
   const [nombre, setNombre] = useState(receta?.nombre ?? `Receta ${producto.nombre}`)
   const [notas, setNotas] = useState(receta?.notas ?? '')
   const [lineas, setLineas] = useState<Linea[]>(() =>
-    receta && receta.lineas.length > 0
-      ? receta.lineas.map((l) => nuevaLinea(l.materiaPrimaId, String(l.cantidad)))
+    receta && receta.estructura.length > 0
+      ? receta.estructura.map((l) => nuevaLinea(claveComponente(l), String(l.cantidad)))
       : [nuevaLinea()]
   )
   const [actualizarCosto, setActualizarCosto] = useState(true)
@@ -47,9 +57,10 @@ export default function RecetaFormulario({
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
 
-  const porId = new Map(materiasPrimas.map((m) => [m.id, m]))
+  const materiaPorId = new Map(materiasPrimas.map((m) => [m.id, m]))
+  const subPorId = new Map(subensambles.map((s) => [s.id, s]))
 
-  const cambiarLinea = (clave: number, campo: 'materiaPrimaId' | 'cantidad', valor: string) => {
+  const cambiarLinea = (clave: number, campo: 'componente' | 'cantidad', valor: string) => {
     setLineas((actual) => actual.map((l) => (l.clave === clave ? { ...l, [campo]: valor } : l)))
     setErrores((actual) => ({ ...actual, [clave]: '' }))
     setErrorGeneral(null)
@@ -57,28 +68,44 @@ export default function RecetaFormulario({
 
   const quitarLinea = (clave: number) => setLineas((actual) => actual.filter((l) => l.clave !== clave))
 
+  const costoUnitarioComponente = (valor: string) => {
+    const comp = leerComponente(valor)
+    if (!comp) return 0
+    return comp.tipo === 'subensamble'
+      ? costoSubensamble(subPorId.get(comp.componenteId), materiasPrimas)
+      : materiaPorId.get(comp.componenteId)?.costoUnitario ?? 0
+  }
   const costoLinea = (linea: Linea) => {
-    const materia = porId.get(linea.materiaPrimaId)
     const cantidad = Number(linea.cantidad)
-    return materia && Number.isFinite(cantidad) && cantidad > 0 ? cantidad * materia.costoUnitario : 0
+    return Number.isFinite(cantidad) && cantidad > 0 ? cantidad * costoUnitarioComponente(linea.componente) : 0
   }
   const costoTotal = lineas.reduce((total, linea) => total + costoLinea(linea), 0)
+
+  // Vista previa de la explosión (nivel 2): materia prima total por unidad
+  const estructuraValida = lineas.flatMap((l) => {
+    const comp = leerComponente(l.componente)
+    const cantidad = Number(l.cantidad)
+    return comp && Number.isFinite(cantidad) && cantidad > 0 ? [{ ...comp, cantidad }] : []
+  })
+  const explosion = explotarEstructura(estructuraValida, subensambles)
+  const tieneSubensambles = estructuraValida.some((l) => l.tipo === 'subensamble')
 
   const enviar = async (evento: React.FormEvent) => {
     evento.preventDefault()
     // Las filas completamente vacías se ignoran
-    const usadas = lineas.filter((l) => l.materiaPrimaId || l.cantidad.trim())
+    const usadas = lineas.filter((l) => l.componente || l.cantidad.trim())
     const nuevosErrores: Record<number, string> = {}
     const vistas = new Set<string>()
-    const definitivas: { materiaPrimaId: string; cantidad: number }[] = []
+    const definitivas: LineaEstructura[] = []
 
     for (const linea of usadas) {
-      if (!linea.materiaPrimaId) { nuevosErrores[linea.clave] = 'Seleccione la materia prima.'; continue }
-      if (vistas.has(linea.materiaPrimaId)) { nuevosErrores[linea.clave] = 'Esta materia prima ya está en la receta.'; continue }
-      vistas.add(linea.materiaPrimaId)
+      const comp = leerComponente(linea.componente)
+      if (!comp) { nuevosErrores[linea.clave] = 'Seleccione el componente.'; continue }
+      if (vistas.has(linea.componente)) { nuevosErrores[linea.clave] = 'Este componente ya está en la receta.'; continue }
+      vistas.add(linea.componente)
       const cantidad = validarNumero(linea.cantidad, { etiqueta: 'La cantidad', mayorQueCero: true, decimales: 3 })
       if (cantidad.error) { nuevosErrores[linea.clave] = cantidad.error; continue }
-      definitivas.push({ materiaPrimaId: linea.materiaPrimaId, cantidad: redondear3(cantidad.valor!) })
+      definitivas.push({ ...comp, cantidad: redondear3(cantidad.valor!) })
     }
 
     setErrores(nuevosErrores)
@@ -86,14 +113,14 @@ export default function RecetaFormulario({
     if (Object.keys(nuevosErrores).length > 0) return
 
     setEnviando(true)
-    const resultado = await guardarReceta({ productoId: producto.id, nombre, notas, lineas: definitivas })
+    const resultado = await guardarReceta({ productoId: producto.id, nombre, notas, estructura: definitivas })
     if (resultado.ok && actualizarCosto && definitivas.length > 0) {
       const costo = await aplicarCostoProducto(producto.id, costoTotal)
       if (!costo.ok) { setEnviando(false); setErrorGeneral(`La receta se guardó, pero no se pudo actualizar el costo: ${costo.error}`); return }
     }
     setEnviando(false)
     if (!resultado.ok) { setErrorGeneral(resultado.error); return }
-    onGuardado(definitivas.length ? 'Receta guardada' : 'Receta guardada sin materia prima')
+    onGuardado(definitivas.length ? 'Receta guardada' : 'Receta guardada sin componentes')
   }
 
   return (
@@ -110,10 +137,13 @@ export default function RecetaFormulario({
       </div>
 
       <div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between gap-3 mb-2">
           <div>
-            <p className="text-xs font-medium text-zinc-700">Materia prima por unidad</p>
-            <p className="text-xs text-zinc-400">Cantidad que lleva UN mousepad. Se descuenta al completar una orden o al vender sin stock.</p>
+            <p className="text-xs font-medium text-zinc-700">Componentes por unidad (nivel 1)</p>
+            <p className="text-xs text-zinc-400">
+              Subensambles y materia prima directa que lleva UN mousepad. Los subensambles se definen en{' '}
+              <Link href="/produccion/subensambles" className="underline">Subensambles</Link>.
+            </p>
           </div>
           <button type="button" onClick={() => setLineas((actual) => [...actual, nuevaLinea()])} className={`${claseBotonSecundario} h-9 shrink-0`}>
             <Plus size={15} />
@@ -130,7 +160,7 @@ export default function RecetaFormulario({
             <table className="w-full min-w-[560px]">
               <thead className="bg-zinc-50/70">
                 <tr>
-                  <th className={claseCabeceraTabla}>Materia prima</th>
+                  <th className={claseCabeceraTabla}>Componente</th>
                   <th className={`${claseCabeceraTabla} w-40`}>Cantidad</th>
                   <th className={`${claseCabeceraTabla} text-right w-28`}>Costo</th>
                   <th className="w-10" />
@@ -138,20 +168,32 @@ export default function RecetaFormulario({
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {lineas.map((linea) => {
-                  const materia = porId.get(linea.materiaPrimaId)
+                  const comp = leerComponente(linea.componente)
+                  const unidad = comp?.tipo === 'subensamble'
+                    ? 'und'
+                    : comp ? (materiaPorId.get(comp.componenteId) ? ABREVIATURAS_UNIDAD[materiaPorId.get(comp.componenteId)!.unidad] : '') : ''
                   return (
                     <tr key={linea.clave} className="align-top">
                       <td className="px-3 py-2">
                         <select
-                          value={linea.materiaPrimaId}
-                          onChange={(e) => cambiarLinea(linea.clave, 'materiaPrimaId', e.target.value)}
+                          value={linea.componente}
+                          onChange={(e) => cambiarLinea(linea.clave, 'componente', e.target.value)}
                           className={claseInput}
-                          aria-label="Materia prima"
+                          aria-label="Componente"
                         >
                           <option value="">Seleccione...</option>
-                          {materiasPrimas.map((m) => (
-                            <option key={m.id} value={m.id}>{m.codigo} — {m.nombre}</option>
-                          ))}
+                          {subensamblesActivos.length > 0 && (
+                            <optgroup label="Subensambles">
+                              {subensamblesActivos.map((s) => (
+                                <option key={s.id} value={`se:${s.id}`}>{s.codigo} — {s.nombre}</option>
+                              ))}
+                            </optgroup>
+                          )}
+                          <optgroup label="Materia prima">
+                            {materiasPrimas.map((m) => (
+                              <option key={m.id} value={`mp:${m.id}`}>{m.codigo} — {m.nombre}</option>
+                            ))}
+                          </optgroup>
                         </select>
                         {errores[linea.clave] && <p className="text-xs text-red-600 mt-1">{errores[linea.clave]}</p>}
                       </td>
@@ -167,9 +209,7 @@ export default function RecetaFormulario({
                             className={`${claseInput} pr-12`}
                             aria-label="Cantidad por unidad"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
-                            {materia ? ABREVIATURAS_UNIDAD[materia.unidad] : ''}
-                          </span>
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">{unidad}</span>
                         </div>
                       </td>
                       <td className="px-3 py-2 text-right text-sm text-zinc-600 leading-10">{formatoCordobas(costoLinea(linea))}</td>
@@ -178,7 +218,7 @@ export default function RecetaFormulario({
                           type="button"
                           onClick={() => quitarLinea(linea.clave)}
                           className="h-10 w-9 inline-flex items-center justify-center rounded-md text-zinc-400 hover:bg-red-50 hover:text-red-600"
-                          aria-label="Quitar materia prima"
+                          aria-label="Quitar componente"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -198,6 +238,23 @@ export default function RecetaFormulario({
           </div>
         )}
       </div>
+
+      {tieneSubensambles && explosion.length > 0 && (
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50/60 px-4 py-3">
+          <p className="text-xs font-medium text-zinc-700 mb-1.5">Explosión de la BOM: materia prima total por unidad (nivel 2)</p>
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-0.5 text-xs sm:grid-cols-2">
+            {explosion.map((l) => {
+              const materia = materiaPorId.get(l.materiaPrimaId)
+              return (
+                <li key={l.materiaPrimaId} className="flex justify-between gap-3">
+                  <span className="text-zinc-600">{materia?.nombre ?? 'Materia prima inactiva'}</span>
+                  <span className="font-medium text-zinc-800">{formatoCantidad(l.cantidad)} {materia ? ABREVIATURAS_UNIDAD[materia.unidad] : ''}</span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
 
       <label className="flex items-start gap-2 text-sm text-zinc-700">
         <input type="checkbox" checked={actualizarCosto} onChange={(e) => setActualizarCosto(e.target.checked)} className="mt-0.5 h-4 w-4 accent-zinc-900" />

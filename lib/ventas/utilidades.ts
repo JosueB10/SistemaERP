@@ -1,7 +1,7 @@
 import type { MateriaPrima, Producto } from '../inventario/tipos'
 import type { OrdenProduccion, Receta } from '../produccion/tipos'
 import { materiaComprometida, recetaDeProducto, redondear3, requerimientos, tieneMateriaDefinida } from '../produccion/utilidades'
-import type { EstadoVenta, MetodoPago, Venta } from './tipos'
+import type { EstadoDespacho, EstadoVenta, MetodoPago, Venta } from './tipos'
 
 // ---------- Etiquetas ----------
 
@@ -9,6 +9,12 @@ export const ETIQUETAS_ESTADO_VENTA: Record<EstadoVenta, string> = {
   pendiente: 'Pendiente',
   completada: 'Completada',
   anulada: 'Anulada'
+}
+
+export const ETIQUETAS_ESTADO_DESPACHO: Record<EstadoDespacho, string> = {
+  por_despachar: 'Por despachar',
+  despachada: 'Despachada',
+  entregada: 'Entregada'
 }
 
 export const ETIQUETAS_METODO_PAGO: Record<MetodoPago, string> = {

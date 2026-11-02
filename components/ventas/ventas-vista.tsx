@@ -8,7 +8,7 @@ import { useInventario } from '@/lib/inventario/store'
 import { coincideBusqueda, fechaHoy, formatoCantidad, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
 import { useVentas } from '@/lib/ventas/store'
 import type { EstadoVenta, MetodoPago } from '@/lib/ventas/tipos'
-import { descargarCsv, ETIQUETAS_ESTADO_VENTA, ETIQUETAS_METODO_PAGO, margenVenta, unidadesVenta } from '@/lib/ventas/utilidades'
+import { descargarCsv, ETIQUETAS_ESTADO_DESPACHO, ETIQUETAS_ESTADO_VENTA, ETIQUETAS_METODO_PAGO, margenVenta, unidadesVenta } from '@/lib/ventas/utilidades'
 import {
   AvisoConexion,
   Buscador,
@@ -210,7 +210,12 @@ export default function VentasVista() {
                       <td className={`${claseCeldaTabla} text-right`}>{formatoCantidad(unidadesVenta(v))}</td>
                       <td className={claseCeldaTabla}>{v.metodoPago ? ETIQUETAS_METODO_PAGO[v.metodoPago] : '—'}</td>
                       <td className={`${claseCeldaTabla} text-right font-semibold ${v.estado === 'anulada' ? 'line-through text-zinc-400' : 'text-zinc-900'}`}>{formatoCordobas(v.total)}</td>
-                      <td className={claseCeldaTabla}><InsigniaDocumento anulado={v.estado === 'anulada'} pendiente={v.estado === 'pendiente'} texto={ETIQUETAS_ESTADO_VENTA[v.estado]} /></td>
+                      <td className={claseCeldaTabla}>
+                        <InsigniaDocumento anulado={v.estado === 'anulada'} pendiente={v.estado === 'pendiente'} texto={ETIQUETAS_ESTADO_VENTA[v.estado]} />
+                        {v.estado === 'completada' && (
+                          <p className={`mt-1 text-[11px] ${v.estadoDespacho === 'por_despachar' ? 'text-amber-700' : 'text-zinc-400'}`}>{ETIQUETAS_ESTADO_DESPACHO[v.estadoDespacho]}</p>
+                        )}
+                      </td>
                       <td className={`${claseCeldaTabla} text-right`}>
                         <button type="button" onClick={() => abrirDetalle(v.id)} className={claseBotonTabla}><Eye size={14} />Ver</button>
                       </td>

@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 
-import { anularCompra, useCompras } from '@/lib/compras/store'
+import { PackageCheck } from 'lucide-react'
+
+import { anularCompra, recibirCompra, useCompras } from '@/lib/compras/store'
 import type { Compra } from '@/lib/compras/tipos'
 import { ETIQUETAS_ESTADO_COMPRA } from '@/lib/compras/utilidades'
 import { useInventario } from '@/lib/inventario/store'
-import { ABREVIATURAS_UNIDAD, formatoCantidad, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
+import { ABREVIATURAS_UNIDAD, fechaHoy, formatoCantidad, formatoCordobas, formatoFecha } from '@/lib/inventario/utilidades'
 import { ETIQUETAS_METODO_PAGO } from '@/lib/ventas/utilidades'
-import { claseCabeceraTabla, claseCeldaTabla, ErrorFormulario } from '../inventario/ui'
+import { Campo, claseBotonPrimario, claseBotonSecundario, claseCabeceraTabla, claseCeldaTabla, claseInput, ErrorFormulario } from '../inventario/ui'
 import { DatoDetalle } from '../recursos-humanos/ui'
 import { ConfirmarAnulacion, InsigniaDocumento, ResumenTotales } from '../ventas/ui'
 
@@ -20,6 +22,20 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
   const materiaPorId = new Map(materiasPrimas.map((m) => [m.id, m]))
   const proveedor = proveedores.find((p) => p.id === compra.proveedorId)
   const anulada = compra.estado === 'anulada'
+  const pendiente = compra.estado === 'pendiente'
+  const [recibiendo, setRecibiendo] = useState(false)
+  const [fechaRecepcion, setFechaRecepcion] = useState(fechaHoy())
+  const [obsRecepcion, setObsRecepcion] = useState('')
+  const [ocupado, setOcupado] = useState(false)
+
+  const recibir = async () => {
+    if (!fechaRecepcion || fechaRecepcion < compra.fecha || fechaRecepcion > fechaHoy()) { setError('La fecha de recepción debe estar entre la fecha de la compra y hoy.'); return }
+    setOcupado(true)
+    const resultado = await recibirCompra(compra.id, fechaRecepcion, obsRecepcion)
+    setOcupado(false)
+    if (!resultado.ok) { setError(resultado.error); return }
+    onAccion(`Compra ${compra.codigo} recibida: la materia prima entró al inventario`)
+  }
 
   const anular = async (motivo: string) => {
     const resultado = await anularCompra(compra.id, motivo)
@@ -35,16 +51,44 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
         <div>
           <p className="font-mono text-xs text-zinc-400">{compra.codigo}</p>
           <p className="text-lg font-semibold text-zinc-900">{proveedor?.nombre ?? 'Proveedor eliminado'}</p>
-          <div className="mt-1"><InsigniaDocumento anulado={anulada} texto={ETIQUETAS_ESTADO_COMPRA[compra.estado]} /></div>
+          <div className="mt-1"><InsigniaDocumento anulado={anulada} pendiente={pendiente} texto={ETIQUETAS_ESTADO_COMPRA[compra.estado]} /></div>
         </div>
-        {!anulada && (
-          <ConfirmarAnulacion
-            aviso="¿Anular esta compra? La materia prima se retirará del inventario (debe seguir en stock) y se eliminará el gasto. El costo unitario no se revierte."
-            textoBoton="Anular compra"
-            onConfirmar={anular}
-          />
+        {!anulada && !recibiendo && (
+          <div className="flex flex-wrap gap-2">
+            {pendiente && (
+              <button type="button" onClick={() => setRecibiendo(true)} className={claseBotonPrimario}><PackageCheck size={15} />Recibir mercadería</button>
+            )}
+            <ConfirmarAnulacion
+              aviso={pendiente
+                ? '¿Anular esta orden de compra? Aún no movió inventario ni gasto.'
+                : '¿Anular esta compra? La materia prima se retirará del inventario (debe seguir en stock) y se eliminará el gasto. El costo unitario no se revierte.'}
+              textoBoton="Anular compra"
+              onConfirmar={anular}
+            />
+          </div>
         )}
       </div>
+
+      {recibiendo && (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 space-y-3">
+          <p className="text-sm text-emerald-900">
+            Confirme que llegó la mercadería completa: la materia prima entra al inventario, se actualiza su costo y se registra el gasto.
+            Si llegó material defectuoso, registre además una no conformidad de materia prima en Calidad.
+          </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <Campo etiqueta="Fecha de recepción" htmlFor="recepcion-fecha">
+              <input id="recepcion-fecha" type="date" min={compra.fecha} max={fechaHoy()} value={fechaRecepcion} onChange={(e) => setFechaRecepcion(e.target.value)} className={claseInput} />
+            </Campo>
+            <Campo etiqueta="Observaciones de recepción" htmlFor="recepcion-obs" className="sm:col-span-2">
+              <input id="recepcion-obs" value={obsRecepcion} onChange={(e) => setObsRecepcion(e.target.value)} placeholder="Estado del material, quién recibió..." className={claseInput} />
+            </Campo>
+          </div>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={() => setRecibiendo(false)} className={claseBotonSecundario}>Volver</button>
+            <button type="button" onClick={recibir} disabled={ocupado} className={claseBotonPrimario}><PackageCheck size={15} />{ocupado ? 'Recibiendo...' : 'Confirmar recepción'}</button>
+          </div>
+        </div>
+      )}
 
       {anulada && (
         <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
@@ -58,6 +102,9 @@ export default function CompraDetalle({ compra, onAccion }: { compra: Compra; on
         <DatoDetalle etiqueta="Método de pago" valor={compra.metodoPago ? ETIQUETAS_METODO_PAGO[compra.metodoPago] : ''} />
         <DatoDetalle etiqueta="RUC" valor={proveedor?.ruc} />
         <DatoDetalle etiqueta="Registrada" valor={compra.registradoEn ? formatoFecha(compra.registradoEn) : ''} />
+        {pendiente && <DatoDetalle etiqueta="Entrega esperada" valor={compra.fechaEntregaEsperada ? formatoFecha(compra.fechaEntregaEsperada) : ''} />}
+        {compra.fechaRecepcion && <DatoDetalle etiqueta="Recibida" valor={formatoFecha(compra.fechaRecepcion)} />}
+        {compra.observacionesRecepcion && <DatoDetalle etiqueta="Nota de recepción" valor={compra.observacionesRecepcion} />}
       </dl>
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200">
