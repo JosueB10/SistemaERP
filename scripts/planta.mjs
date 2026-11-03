@@ -1,4 +1,4 @@
-// npm run dev:planta → levanta el ERP (next dev) y, cuando responde, conecta el emulador IIoT de la planta.
+// Comentario de Henry Lanuza: npm run dev:planta → levanta el ERP (next dev) y, cuando responde, conecta el emulador IIoT de la planta.
 // Si el ERP ya está corriendo en el puerto, solo conecta la planta. Ctrl+C detiene todo.
 // La clave se toma de IIOT_API_KEY en .env.local.
 import { spawn, spawnSync } from 'node:child_process'
@@ -24,7 +24,7 @@ function comandoPython() {
   return null
 }
 
-// Estado del ERP en el puerto: 'apagado', 'sin-clave' (responde pero no reconoce la clave) o el JSON de /api/iiot/lecturas
+// Comentarios por Henry Lanuza: Estado del ERP en el puerto: 'apagado', 'sin-clave' (responde pero no reconoce la clave) o el JSON de /api/iiot/lecturas
 async function estadoErp(clave) {
   try {
     const r = await fetch(`${URL_ERP}/api/iiot/lecturas`, { headers: { 'x-api-key': clave ?? '' } })

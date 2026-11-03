@@ -1,5 +1,5 @@
 import { claveValida, clienteServicio, respuestaNoAutorizado, respuestaSinConfigurar } from '@/lib/iiot/servidor'
-
+//Por aquí anduvo Henry Lanuza, equipo de revisión
 // Endpoint IIoT: los dispositivos de planta (o iiot/emulador.py) envían aquí sus lecturas.
 // Autenticación por clave de dispositivo en la cabecera x-api-key (variable IIOT_API_KEY).
 // Las lecturas se guardan con la llave de servicio de Supabase (SUPABASE_SERVICE_ROLE_KEY, solo servidor).
